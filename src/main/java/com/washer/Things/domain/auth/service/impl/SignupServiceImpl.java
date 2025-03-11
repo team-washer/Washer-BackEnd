@@ -1,7 +1,13 @@
 package com.washer.Things.domain.auth.service.impl;
 
+import com.washer.Things.domain.auth.presentation.dto.request.SignupRequest;
+import com.washer.Things.domain.auth.presentation.dto.response.TokenResponse;
 import com.washer.Things.domain.auth.service.SignupService;
+import com.washer.Things.domain.user.entity.Role;
+import com.washer.Things.domain.user.entity.User;
 import com.washer.Things.domain.user.repository.UserRepository;
+import com.washer.Things.global.exception.HttpException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,8 +29,9 @@ public class SignupServiceImpl implements SignupService {
                 .name(request.getName())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .email(request.getEmail())
-                .gender(request.getGender())
-                .schoolNumber(request.getSchoolNumber())
+                .grade(request.getGrade())
+                .classRoom(request.getClassRoom())
+                .number(request.getNumber())
                 .roles(List.of(Role.ROLE_USER))
                 .build();
         userRepository.save(user);
