@@ -24,9 +24,11 @@ public class User {
 
     private String name;
 
-    private String room;
+    private String grade;
 
-    private String schoolNumber;
+    private String classRoom;
+
+    private String number;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
