@@ -38,4 +38,7 @@ public class User {
     @Convert(converter = StringListConverter.class)
     private List<Role> roles;
 
+    @ManyToOne
+    @JoinColumn(name = "room_id")
+    private Room room;
 }
