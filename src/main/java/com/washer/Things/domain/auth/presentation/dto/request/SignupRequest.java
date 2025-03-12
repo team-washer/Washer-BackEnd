@@ -31,4 +31,10 @@ public class SignupRequest {
 
     @NotBlank
     private String number;
+
+    @NotBlank
+    private String gender;
+
+    @NotBlank
+    private String room;
 }
