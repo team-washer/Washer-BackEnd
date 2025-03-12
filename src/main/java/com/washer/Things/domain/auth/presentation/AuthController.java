@@ -11,10 +11,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 @RequestMapping("/auth")
 @RestController
 @RequiredArgsConstructor
@@ -36,10 +34,8 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<TokenResponse> refreshToken(HttpServletRequest request){
-        String accessToken = request.getHeader("access");
-        String refreshToken = request.getHeader("refresh");
-        TokenResponse response = refreshService.refresh(accessToken, refreshToken);
+    public ResponseEntity<TokenResponse> refreshToken(@RequestHeader("Refresh-Token") String refreshToken){
+        TokenResponse response = refreshService.refresh(refreshToken);
         return ResponseEntity.ok(response);
     }
 }

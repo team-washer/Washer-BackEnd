@@ -83,15 +83,11 @@ public class TokenProvider {
     }
 
     public Boolean validateToken(String token){
-        byte[] keyBytes = Base64.getEncoder().encode(secretKey.getBytes());
-        SecretKey signingKey = Keys.hmacShaKeyFor(keyBytes);
-
-        return Jwts.parser()
-                .verifyWith(signingKey)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getExpiration()
-                .before(new Date());
+        try {
+            Date expiration = getClaims(token).getExpiration();
+            return expiration.after(new Date());
+        } catch (HttpException e) {
+            return false;
+        }
     }
 }
