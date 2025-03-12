@@ -1,5 +1,6 @@
-package com.washer.Things.domain.user.entity;
+package com.washer.Things.domain.room.entity;
 
+import com.washer.Things.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 

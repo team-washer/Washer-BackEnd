@@ -1,6 +1,7 @@
 package com.washer.Things.domain.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.washer.Things.domain.room.entity.Room;
 import com.washer.Things.domain.user.util.StringListConverter;
 import jakarta.persistence.*;
 import lombok.*;
