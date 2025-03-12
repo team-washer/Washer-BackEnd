@@ -26,7 +26,7 @@ public class SignupServiceImpl implements SignupService {
     @Transactional
     public TokenResponse signup(SignupRequest request) {
         if(userRepository.existsUserByEmail(request.getEmail()))
-            throw new HttpException(HttpStatus.BAD_REQUEST, "이미 해당 이름을 사용하는 멤버가 존재합니다.");
+            throw new HttpException(HttpStatus.BAD_REQUEST, "이미 해당 메일을 사용하는 멤버가 존재합니다.");
 
         Room room = roomRepository.findByName(request.getRoom())
                 .orElseThrow(() -> new HttpException(HttpStatus.BAD_REQUEST, "존재하지 않는 방입니다."));
