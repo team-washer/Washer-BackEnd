@@ -30,6 +30,8 @@ public class User {
 
     private String number;
 
+    private String gender;
+
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
