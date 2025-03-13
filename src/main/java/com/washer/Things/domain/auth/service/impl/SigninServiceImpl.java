@@ -25,6 +25,6 @@ public class SigninServiceImpl implements SigninService {
                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "없는 유저 입니다."));
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword()))
             throw new HttpException(HttpStatus.UNAUTHORIZED, "비밀번호가 틀렸습니다.");
-        return tokenProvider.generateTokenSet(user.getId());
+        return tokenProvider.generateTokenSet(user.getId(), user.getRoles().get(0));
     }
 }

@@ -1,6 +1,7 @@
 package com.washer.Things.global.security.jwt;
 
 import com.washer.Things.domain.auth.presentation.dto.response.TokenResponse;
+import com.washer.Things.domain.user.entity.Role;
 import com.washer.Things.global.entity.TokenType;
 import com.washer.Things.global.exception.HttpException;
 import io.jsonwebtoken.*;
@@ -14,8 +15,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -29,25 +34,42 @@ public class TokenProvider {
     @Value("${jwt.refresh}")
     private Long refresh;
 
-    public TokenResponse generateTokenSet(Long id){
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = Base64.getEncoder().encode(secretKey.getBytes());
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+    public TokenResponse generateTokenSet(Long id, Role role){
+        Long now = System.currentTimeMillis();
+        Long accessTokenExpires = now + access;
+        Long refreshTokenExpires = now + refresh;
+
+        String accessToken = generateToken(id, role, accessTokenExpires, TokenType.ACCESS);
+        String refreshToken = generateToken(id, role, refreshTokenExpires, TokenType.REFRESH);
+
         return new TokenResponse(
-                generateToken(id, TokenType.ACCESS),
-                generateToken(id, TokenType.REFRESH)
+                accessToken,
+                convertToIso8601Kst(accessTokenExpires),
+                refreshToken,
+                convertToIso8601Kst(refreshTokenExpires),
+                role
         );
     }
 
-    public String generateToken(Long id, TokenType tokenType) {
-        Long expired = tokenType == TokenType.ACCESS ? access : refresh;
-
-        byte[] keyBytes = Base64.getEncoder().encode(secretKey.getBytes());
-        SecretKey signingKey = Keys.hmacShaKeyFor(keyBytes);
-
+    private String generateToken(Long userId, Role role, Long expiresAt, TokenType tokenType) {
         return Jwts.builder()
-                .signWith(signingKey)
-                .subject(String.valueOf(id))
+                .signWith(getSigningKey())
+                .subject(String.valueOf(userId))
+                .claims(Map.of("role", role))
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + expired))
+                .expiration(new Date(expiresAt))
                 .compact();
+    }
+
+
+    private String convertToIso8601Kst(Long timestamp) {
+        return Instant.ofEpochMilli(timestamp)
+                .atZone(ZoneId.of("Asia/Seoul"))
+                .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
     }
 
     public UsernamePasswordAuthenticationToken getAuthentication(String token) {

@@ -17,18 +17,11 @@ import java.util.Locale;
 @EntityListeners(AuditingEntityListener.class)
 public class BaseTime {
     private LocalDateTime createAt;
-    private String formattedDate;
-    private String dayOfWeek;
     private String yearMonthDay;
-
     @PrePersist
     protected void onCreate() {
         createAt = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).toLocalDateTime();
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MM.dd");
         DateTimeFormatter yearMonthDayFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
         yearMonthDay = createAt.format(yearMonthDayFormatter);
-        formattedDate = createAt.format(dateFormatter);
-        dayOfWeek = createAt.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.KOREAN);
     }
-
 }
