@@ -7,6 +7,18 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  mail:
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: 'true'
+          auth: 'true'
+    host: smtp.gmail.com
+    username: ${EMAIL}
+    password: ${EMAIL_PASSWORD}
+    port: '587'
+
   jpa:
     hibernate:
       ddl-auto: update
