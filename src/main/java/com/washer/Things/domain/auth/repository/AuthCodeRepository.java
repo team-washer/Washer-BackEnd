@@ -6,5 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AuthCodeRepository extends JpaRepository<AuthCode, Long> {
-
+    AuthCode findByEmail(String email);
+    boolean existsByEmail(String email);
+    void deleteByEmail(String email);
 }
