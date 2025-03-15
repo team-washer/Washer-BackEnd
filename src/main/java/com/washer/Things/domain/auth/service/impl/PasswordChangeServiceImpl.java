@@ -25,7 +25,7 @@ public class PasswordChangeServiceImpl implements PasswordChangeService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     @Transactional
-    public void execute(AuthCodeRequest request) {
+    public void sendMail(AuthCodeRequest request) {
         if (authCodeRepository.existsByEmail(request.getEmail())) {
             authCodeRepository.deleteByEmail(request.getEmail());
         }
@@ -41,7 +41,7 @@ public class PasswordChangeServiceImpl implements PasswordChangeService {
     }
 
     @Transactional
-    public void execute(PwChangeRequest request) {
+    public void passwordChange(PwChangeRequest request) {
         AuthCode findCode = authCodeRepository.findByEmail(request.getEmail());
         UUID requestCode = UUID.fromString(request.getCode());
         if (findCode == null) {
