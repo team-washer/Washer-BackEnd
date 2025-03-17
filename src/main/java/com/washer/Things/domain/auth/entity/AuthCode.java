@@ -32,12 +32,12 @@ public class AuthCode {
     public AuthCode(AuthCodeRequest request) {
         this.email = request.getEmail();
         this.code = generateAuthCode();
-        this.expiresAt = LocalDateTime.now().plusMinutes(3); // 3분 후 만료
+        this.expiresAt = LocalDateTime.now().plusMinutes(3);
     }
 
     private String generateAuthCode() {
         Random random = new Random();
-        return String.format("%05d", random.nextInt(100000)); // 5자리 숫자 생성
+        return String.format("%05d", random.nextInt(100000));
     }
 
     public boolean isExpired() {

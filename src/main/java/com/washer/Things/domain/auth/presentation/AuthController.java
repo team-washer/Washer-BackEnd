@@ -26,9 +26,13 @@ public class AuthController {
     private final PasswordChangeService passwordChangeService;
 
     @PostMapping("/signup")
-    public ResponseEntity<TokenResponse> signup(@RequestBody @Valid SignupRequest request) {
-        TokenResponse response = signupService.signup(request);
-        return ResponseEntity.ok(response);
+    public void signup(@RequestBody @Valid SignupRequest request) {
+        signupService.signup(request);
+    }
+
+    @PostMapping("/signupmailsend")
+    public void signupMailSend(@RequestBody @Valid AuthCodeRequest request){
+        signupService.sendSignupMail(request);
     }
 
     @PostMapping("/signin")
