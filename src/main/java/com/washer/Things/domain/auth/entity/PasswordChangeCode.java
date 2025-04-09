@@ -23,13 +23,13 @@ public class PasswordChangeCode {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "email", unique = true, nullable = false)
+    @Column(name = "email")
     private String email;
 
-    @Column(name = "password_change_code", nullable = false, length = 5)
+    @Column(name = "password_change_code", length = 5)
     private String passwordChangeCode;
 
-    @Column(name = "password_change_expires_at", nullable = false)
+    @Column(name = "password_change_expires_at")
     private LocalDateTime passwordChangeCodeExpiresAt;
     public PasswordChangeCode(PasswordChangeCodeRequest request) {
         this.email = request.getEmail();

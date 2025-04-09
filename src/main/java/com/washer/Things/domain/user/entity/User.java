@@ -15,7 +15,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -25,14 +24,11 @@ public class User {
 
     private String name;
 
-    private String grade;
-
-    private String classRoom;
-
-    private String number;
+    private String schoolNumber;
 
     private String gender;
 
+    @Column(name = "email_verify_status", columnDefinition = "TINYINT(1)")
     private boolean emailVerifyStatus;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

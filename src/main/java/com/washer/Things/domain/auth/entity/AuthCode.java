@@ -23,20 +23,14 @@ public class AuthCode {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "email", unique = true, nullable = false)
+    @Column(name = "email")
     private String email;
 
-    @Column(name = "code", nullable = false, length = 5)
+    @Column(name = "code", length = 5)
     private String code;
 
-    @Column(name = "password_change_code", nullable = false, length = 5)
-    private String passwordChangeCode;
-
-    @Column(name = "auth_expires_at", nullable = false)
+    @Column(name = "auth_expires_at")
     private LocalDateTime authCodeExpiresAt;
-
-    @Column(name = "password_change_expires_at", nullable = false)
-    private LocalDateTime passwordChangeCodeExpiresAt;
 
     public AuthCode(AuthCodeRequest request) {
         this.email = request.getEmail();

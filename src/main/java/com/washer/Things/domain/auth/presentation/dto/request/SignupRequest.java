@@ -24,13 +24,7 @@ public class SignupRequest {
     private String name;
 
     @NotBlank
-    private String grade;
-
-    @NotBlank
-    private String classRoom;
-
-    @NotBlank
-    private String number;
+    private String schoolNumber;
 
     @NotBlank
     private String gender;
