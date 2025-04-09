@@ -1,6 +1,7 @@
 package com.washer.Things.domain.auth.service.impl;
 import com.washer.Things.domain.auth.entity.AuthCode;
 import com.washer.Things.domain.auth.presentation.dto.request.AuthCodeRequest;
+import com.washer.Things.domain.auth.presentation.dto.request.EmailVerifyRequest;
 import com.washer.Things.domain.auth.repository.AuthCodeRepository;
 import com.washer.Things.domain.room.entity.Room;
 import com.washer.Things.domain.auth.presentation.dto.request.SignupRequest;
@@ -44,30 +45,40 @@ public class SignupServiceImpl implements SignupService {
         javaMailSender.send(mailMessage);
     }
     @Transactional
-    public void emailVerify()
+    public void emailVerify(EmailVerifyRequest request) {
+        AuthCode code = authCodeRepository.findByEmail(request.getEmail());
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "없는 유저 입니다."));
+        if (code == null) {
+            throw new RuntimeException("인증 코드가 존재하지 않습니다.");
+        }
+        if (code.isAuthCodeExpired()) {
+            authCodeRepository.deleteByEmail(request.getEmail());
+            throw new RuntimeException("인증 코드가 만료되었습니다.");
+        }
+        if (!code.getCode().equals(request.getCode())) {
+            throw new RuntimeException("잘못된 인증 코드입니다.");
+        }
+
+        user.setEmailVerifyStatus(true);
+    }
 
     @Transactional
     public void signup(SignupRequest request) {
         if(userRepository.existsUserByEmail(request.getEmail()))
             throw new HttpException(HttpStatus.BAD_REQUEST, "이미 해당 메일을 사용하는 멤버가 존재합니다.");
 
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "없는 유저 입니다."));
+
+        if(user.isEmailVerifyStatus()) {
+            throw new HttpException(HttpStatus.BAD_REQUEST, "인증되지 않은 유저입니다");
+        }
+
         Room room = roomRepository.findByName(request.getRoom())
                 .orElseThrow(() -> new HttpException(HttpStatus.BAD_REQUEST, "존재하지 않는 방입니다."));
-
-        AuthCode findCode = authCodeRepository.findByEmail(request.getEmail());
-
-        if (findCode == null) {
-            throw new RuntimeException("인증 코드가 존재하지 않습니다.");
-        }
-        if (findCode.isExpired()) {
-            authCodeRepository.deleteByEmail(request.getEmail());
-            throw new RuntimeException("인증 코드가 만료되었습니다.");
-        }
-        if (!findCode.getCode().equals(request.getCode())) {
-            throw new RuntimeException("잘못된 인증 코드입니다.");
-        }
-
-        User user = User.builder()
+        User.builder()
                 .name(request.getName())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .email(request.getEmail())

@@ -10,5 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class EmailVerifyRequest {
     @NotBlank
+    private String email;
+
+    @NotBlank
     private String code;
 }

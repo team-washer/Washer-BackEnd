@@ -34,7 +34,7 @@ public class AuthController {
 
     @PostMapping("/signup/emailverify")
     public void signupEmailVerify(@RequestBody @Valid EmailVerifyRequest request){
-        signupService.
+        signupService.emailVerify(request);
     }
 
     @PostMapping("/signin")
