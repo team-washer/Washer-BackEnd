@@ -37,7 +37,4 @@ public class SignupRequest {
 
     @NotBlank
     private String room;
-
-    @NotBlank
-    private String code;
 }

@@ -43,8 +43,8 @@ public class SignupServiceImpl implements SignupService {
         mailMessage.setText("이메일 인증 코드 입니다.\n" + authCode.getCode());
         javaMailSender.send(mailMessage);
     }
-
-    public void
+    @Transactional
+    public void emailVerify()
 
     @Transactional
     public void signup(SignupRequest request) {

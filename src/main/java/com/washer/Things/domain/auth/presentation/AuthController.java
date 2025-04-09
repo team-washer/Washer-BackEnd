@@ -32,6 +32,11 @@ public class AuthController {
         signupService.sendSignupMail(request);
     }
 
+    @PostMapping("/signup/emailverify")
+    public void signupEmailVerify(@RequestBody @Valid EmailVerifyRequest request){
+        signupService.
+    }
+
     @PostMapping("/signin")
     public ResponseEntity<TokenResponse> signin(@RequestBody @Valid SigninRequest request) {
         TokenResponse response = signinService.signin(request);
