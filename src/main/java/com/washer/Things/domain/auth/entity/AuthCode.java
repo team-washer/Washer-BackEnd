@@ -26,21 +26,36 @@ public class AuthCode {
     @Column(name = "code", nullable = false, length = 5)
     private String code;
 
-    @Column(name = "expires_at", nullable = false)
-    private LocalDateTime expiresAt;
+    @Column(name = "password_change_code", nullable = false, length = 5)
+    private String passwordChangeCode;
+
+    @Column(name = "auth_expires_at", nullable = false)
+    private LocalDateTime authCodeExpiresAt;
+
+    @Column(name = "password_change_expires_at", nullable = false)
+    private LocalDateTime passwordChangeCodeExpiresAt;
 
     public AuthCode(AuthCodeRequest request) {
         this.email = request.getEmail();
-        this.code = generateAuthCode();
-        this.expiresAt = LocalDateTime.now().plusMinutes(3);
+        this.code = generateCode();
+        this.authCodeExpiresAt = LocalDateTime.now().plusMinutes(3);
+    }
+    public void PasswordChangeCode(AuthCodeRequest request) {
+        this.email = request.getEmail();
+        this.passwordChangeCode = generateCode();
+        this.passwordChangeCodeExpiresAt = LocalDateTime.now().plusMinutes(3);
     }
 
-    private String generateAuthCode() {
+    private String generateCode() {
         Random random = new Random();
         return String.format("%05d", random.nextInt(100000));
     }
 
-    public boolean isExpired() {
-        return LocalDateTime.now().isAfter(this.expiresAt);
+    public boolean isAuthCodeExpired() {
+        return LocalDateTime.now().isAfter(this.authCodeExpiresAt);
+    }
+
+    public boolean isPasswordChangeCodeExpired() {
+        return LocalDateTime.now().isAfter(this.passwordChangeCodeExpiresAt);
     }
 }

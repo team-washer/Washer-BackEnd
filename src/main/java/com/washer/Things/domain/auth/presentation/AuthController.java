@@ -30,7 +30,7 @@ public class AuthController {
         signupService.signup(request);
     }
 
-    @PostMapping("/signupmailsend")
+    @PostMapping("/signup/mailsend")
     public void signupMailSend(@RequestBody @Valid AuthCodeRequest request){
         signupService.sendSignupMail(request);
     }

@@ -33,6 +33,8 @@ public class User {
 
     private String gender;
 
+    private boolean emailVerifyStatus;
+
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
