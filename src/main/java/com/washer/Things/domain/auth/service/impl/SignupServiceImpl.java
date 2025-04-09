@@ -32,7 +32,7 @@ public class SignupServiceImpl implements SignupService {
     @Transactional
     public void sendSignupMail(AuthCodeRequest request) {
         if(userRepository.existsUserByEmail(request.getEmail()))
-            throw new HttpException(HttpStatus.BAD_REQUEST, "이미 해당 메일을 사용하는 멤버가 존재합니다.");
+            throw new HttpException(HttpStatus.BAD_REQUEST, "이미 해당 메일을 사용하는 유저가 존재합니다.");
 
         authCodeRepository.deleteByEmail(request.getEmail());
         AuthCode authCode = authCodeRepository.save(new AuthCode(request));
@@ -43,6 +43,8 @@ public class SignupServiceImpl implements SignupService {
         mailMessage.setText("이메일 인증 코드 입니다.\n" + authCode.getCode());
         javaMailSender.send(mailMessage);
     }
+
+    public void
 
     @Transactional
     public void signup(SignupRequest request) {

@@ -12,13 +12,13 @@ import java.time.LocalDateTime;
 import java.util.Random;
 import java.util.UUID;
 
-@Table(name = "auth_code")
+@Table(name = "password_change_code")
 @Getter
 @Setter
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthCode {
+public class PasswordChangeCode {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -26,22 +26,15 @@ public class AuthCode {
     @Column(name = "email", unique = true, nullable = false)
     private String email;
 
-    @Column(name = "code", nullable = false, length = 5)
-    private String code;
-
     @Column(name = "password_change_code", nullable = false, length = 5)
     private String passwordChangeCode;
 
-    @Column(name = "auth_expires_at", nullable = false)
-    private LocalDateTime authCodeExpiresAt;
-
     @Column(name = "password_change_expires_at", nullable = false)
     private LocalDateTime passwordChangeCodeExpiresAt;
-
-    public AuthCode(AuthCodeRequest request) {
+    public PasswordChangeCode(PasswordChangeCodeRequest request) {
         this.email = request.getEmail();
-        this.code = generateCode();
-        this.authCodeExpiresAt = LocalDateTime.now().plusMinutes(3);
+        this.passwordChangeCode = generateCode();
+        this.passwordChangeCodeExpiresAt = LocalDateTime.now().plusMinutes(3);
     }
 
     private String generateCode() {
@@ -49,7 +42,7 @@ public class AuthCode {
         return String.format("%05d", random.nextInt(100000));
     }
 
-    public boolean isAuthCodeExpired() {
-        return LocalDateTime.now().isAfter(this.authCodeExpiresAt);
+    public boolean isPasswordChangeCodeExpired() {
+        return LocalDateTime.now().isAfter(this.passwordChangeCodeExpiresAt);
     }
 }

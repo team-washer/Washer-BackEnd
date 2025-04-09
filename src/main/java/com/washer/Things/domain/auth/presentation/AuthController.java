@@ -1,10 +1,7 @@
 package com.washer.Things.domain.auth.presentation;
 
 
-import com.washer.Things.domain.auth.presentation.dto.request.AuthCodeRequest;
-import com.washer.Things.domain.auth.presentation.dto.request.PwChangeRequest;
-import com.washer.Things.domain.auth.presentation.dto.request.SigninRequest;
-import com.washer.Things.domain.auth.presentation.dto.request.SignupRequest;
+import com.washer.Things.domain.auth.presentation.dto.request.*;
 import com.washer.Things.domain.auth.presentation.dto.response.TokenResponse;
 import com.washer.Things.domain.auth.service.PasswordChangeService;
 import com.washer.Things.domain.auth.service.RefreshService;
@@ -48,7 +45,7 @@ public class AuthController {
     }
 
     @PostMapping( "/mailsend")
-    public void mailSend(@RequestBody @Valid AuthCodeRequest request){
+    public void mailSend(@RequestBody @Valid PasswordChangeCodeRequest request){
         passwordChangeService.sendMail(request);
     }
 
