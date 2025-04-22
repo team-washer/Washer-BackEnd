@@ -86,6 +86,5 @@ public class SignupServiceImpl implements SignupService {
         user.setGender(request.getGender());
         user.setRoom(room);
         userRepository.save(user);
-        authCodeRepository.deleteByEmail(request.getEmail());
     }
 }
