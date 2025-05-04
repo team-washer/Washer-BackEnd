@@ -1,8 +1,8 @@
 package com.washer.Things.domain.auth.service;
 
 import com.washer.Things.domain.auth.presentation.dto.request.SigninRequest;
-import com.washer.Things.domain.auth.presentation.dto.response.TokenResponse;
+import com.washer.Things.domain.auth.presentation.dto.response.SignInResponse;
 
 public interface SigninService {
-    TokenResponse signin(SigninRequest request);
+    SignInResponse execute(SigninRequest request);
 }

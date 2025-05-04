@@ -2,12 +2,13 @@ package com.washer.Things.domain.auth.presentation;
 
 
 import com.washer.Things.domain.auth.presentation.dto.request.*;
-import com.washer.Things.domain.auth.presentation.dto.response.TokenResponse;
+import com.washer.Things.domain.auth.presentation.dto.response.ReissueTokenResponse;
+import com.washer.Things.domain.auth.presentation.dto.response.SignInResponse;
 import com.washer.Things.domain.auth.service.PasswordChangeService;
 import com.washer.Things.domain.auth.service.RefreshService;
 import com.washer.Things.domain.auth.service.SigninService;
 import com.washer.Things.domain.auth.service.SignupService;
-import jakarta.servlet.http.HttpServletRequest;
+import com.washer.Things.global.security.jwt.JwtProvider;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ public class AuthController {
     private final SigninService signinService;
     private final RefreshService refreshService;
     private final PasswordChangeService passwordChangeService;
+    private final JwtProvider jwtProvider;
 
     @PostMapping("/signup")
     public void signup(@RequestBody @Valid SignupRequest request) {
@@ -38,24 +40,24 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<TokenResponse> signin(@RequestBody @Valid SigninRequest request) {
-        TokenResponse response = signinService.signin(request);
+    public ResponseEntity<SignInResponse> signin(@RequestBody @Valid SigninRequest request) {
+        SignInResponse response = signinService.execute(request);
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/refresh")
-    public ResponseEntity<TokenResponse> refreshToken(@RequestHeader("Refresh-Token") String refreshToken){
-        TokenResponse response = refreshService.refresh(refreshToken);
-        return ResponseEntity.ok(response);
+    @PostMapping("/reissue")
+    public ReissueTokenResponse reissueToken(@RequestHeader("Refresh-Token") String refreshHeader) {
+        String refreshToken = jwtProvider.resolveToken(refreshHeader);
+        return refreshService.execute(refreshToken);
     }
 
-    @PostMapping( "/mailsend")
-    public void mailSend(@RequestBody @Valid PasswordChangeCodeRequest request){
+    @PostMapping( "/pwchange/mailsend")
+    public void mailSend(@RequestBody @Valid AuthCodeRequest request){
         passwordChangeService.sendMail(request);
     }
 
     @PostMapping("/pwchange")
-    public void mailCheck(@RequestBody @Valid PwChangeRequest request) {
+    public void mailCheck(@RequestBody @Valid PasswordChangeRequest request) {
         passwordChangeService.passwordChange(request);
     }
 }

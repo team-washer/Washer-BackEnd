@@ -1,34 +1,34 @@
 package com.washer.Things.domain.auth.service.impl;
 
-import com.washer.Things.domain.auth.presentation.dto.response.TokenResponse;
+import com.washer.Things.domain.auth.presentation.dto.response.ReissueTokenResponse;
 import com.washer.Things.domain.auth.service.RefreshService;
-import com.washer.Things.domain.user.entity.User;
-import com.washer.Things.domain.user.repository.UserRepository;
-import com.washer.Things.global.exception.HttpException;
-import com.washer.Things.global.security.jwt.TokenProvider;
-import jakarta.transaction.Transactional;
+import com.washer.Things.global.entity.JwtType;
+import com.washer.Things.global.exception.enums.ExceptionEnum;
+import com.washer.Things.global.security.jwt.JwtProvider;
+import com.washer.Things.global.security.jwt.dto.JwtDetails;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class RefreshServiceImpl implements RefreshService {
-    private final UserRepository userRepository;
-    private final TokenProvider tokenProvider;
-    @Transactional
-    public TokenResponse refresh(String refresh){
-        refresh = refresh.substring(7);
+    private final JwtProvider jwtProvider;
 
-        Boolean validateRefresh = tokenProvider.validateToken(refresh);
-        if (!validateRefresh) {
-            throw new HttpException(HttpStatus.UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다.");
+    public ReissueTokenResponse execute(String resolveRefreshToken) {
+        Long currentUserId = Long.parseLong(jwtProvider.getIdByRefreshToken(resolveRefreshToken));
+
+        if (!jwtProvider.validateToken(resolveRefreshToken, JwtType.REFRESH_TOKEN)) {
+            throw ExceptionEnum.AUTH_EXPIRED_TOKEN.toHttpException();
         }
 
-        Long userId = Long.parseLong(tokenProvider.getClaims(refresh).getSubject());
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "해당하는 유저를 찾을 수 없습니다."));
+        JwtDetails newAccessToken = jwtProvider.generateToken(currentUserId, JwtType.ACCESS_TOKEN);
+        JwtDetails newRefreshToken = jwtProvider.generateToken(currentUserId, JwtType.REFRESH_TOKEN);
 
-        return tokenProvider.generateTokenSet(user.getId(), user.getRoles().get(0));
+        return new ReissueTokenResponse(
+                newAccessToken.getToken(),
+                newAccessToken.getExpiredAt(),
+                newRefreshToken.getToken(),
+                newRefreshToken.getExpiredAt()
+        );
     }
 }

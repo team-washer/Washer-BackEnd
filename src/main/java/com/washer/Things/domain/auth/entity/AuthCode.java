@@ -1,7 +1,7 @@
 package com.washer.Things.domain.auth.entity;
 
+import com.washer.Things.domain.auth.entity.enums.VerifyCodeType;
 import com.washer.Things.domain.auth.presentation.dto.request.AuthCodeRequest;
-import com.washer.Things.domain.auth.presentation.dto.request.PasswordChangeCodeRequest;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,8 +32,12 @@ public class AuthCode {
     @Column(name = "auth_expires_at")
     private LocalDateTime authCodeExpiresAt;
 
-    public AuthCode(AuthCodeRequest request) {
-        this.email = request.getEmail();
+    @Enumerated(EnumType.STRING)
+    private VerifyCodeType type;
+
+    public AuthCode(AuthCodeRequest emailCodeRequest, VerifyCodeType type) {
+        this.email = emailCodeRequest.getEmail();
+        this.type = type;
         this.code = generateCode();
         this.authCodeExpiresAt = LocalDateTime.now().plusMinutes(3);
     }

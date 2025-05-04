@@ -1,8 +1,9 @@
 package com.washer.Things.domain.auth.service;
 
 
-import com.washer.Things.domain.auth.presentation.dto.response.TokenResponse;
+import com.washer.Things.domain.auth.presentation.dto.response.ReissueTokenResponse;
+import com.washer.Things.domain.auth.presentation.dto.response.SignInResponse;
 
 public interface RefreshService {
-    TokenResponse refresh(String refresh);
+    ReissueTokenResponse execute(String resolveRefreshToken);
 }

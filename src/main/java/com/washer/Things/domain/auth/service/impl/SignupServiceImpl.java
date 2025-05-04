@@ -1,11 +1,11 @@
 package com.washer.Things.domain.auth.service.impl;
 import com.washer.Things.domain.auth.entity.AuthCode;
+import com.washer.Things.domain.auth.entity.enums.VerifyCodeType;
 import com.washer.Things.domain.auth.presentation.dto.request.AuthCodeRequest;
 import com.washer.Things.domain.auth.presentation.dto.request.EmailVerifyRequest;
 import com.washer.Things.domain.auth.repository.AuthCodeRepository;
 import com.washer.Things.domain.room.entity.Room;
 import com.washer.Things.domain.auth.presentation.dto.request.SignupRequest;
-import com.washer.Things.domain.auth.presentation.dto.response.TokenResponse;
 import com.washer.Things.domain.auth.service.SignupService;
 import com.washer.Things.domain.room.repository.RoomRepository;
 import com.washer.Things.domain.user.entity.Role;
@@ -35,7 +35,7 @@ public class SignupServiceImpl implements SignupService {
         if(userRepository.existsUserByEmail(request.getEmail()))
             throw new HttpException(HttpStatus.BAD_REQUEST, "이미 해당 메일을 사용하는 유저가 존재합니다.");
         authCodeRepository.deleteByEmail(request.getEmail());
-        AuthCode authCode = authCodeRepository.save(new AuthCode(request));
+        AuthCode authCode = authCodeRepository.save(new AuthCode(request, VerifyCodeType.SIGNUP));
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(authCode.getEmail());
         mailMessage.setSubject("washer 이메일 확인 코드 입니다.");

@@ -1,6 +1,6 @@
 package com.washer.Things.global.security.config;
 import com.washer.Things.global.filter.JwtFilter;
-import com.washer.Things.global.security.jwt.TokenProvider;
+import com.washer.Things.global.security.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,7 +10,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class JwtSecurityConfig extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
 
-    private final TokenProvider tokenProvider;
+    private final JwtProvider tokenProvider;
 
     @Override
     public void configure(HttpSecurity http) {
