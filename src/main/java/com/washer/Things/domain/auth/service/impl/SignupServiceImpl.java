@@ -47,10 +47,6 @@ public class SignupServiceImpl implements SignupService {
     @Transactional
     public void emailVerify(EmailVerifyRequest request) {
         AuthCode code = authCodeRepository.findByEmail(request.getEmail());
-        if (code == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "인증 코드가 존재하지 않습니다.");
-        }
-
         if (code.isAuthCodeExpired()) {
             authCodeRepository.deleteByEmail(request.getEmail());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "인증 코드가 만료되었습니다.");

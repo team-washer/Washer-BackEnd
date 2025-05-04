@@ -40,12 +40,6 @@ public class PasswordChangeServiceImpl implements PasswordChangeService {
     @Transactional
     public void passwordChange(PasswordChangeRequest request) {
         AuthCode findCode = authCodeRepository.findByEmail(request.getEmail());
-
-
-        if (findCode == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "인증 코드가 존재하지 않습니다.");
-        }
-
         if (findCode.isAuthCodeExpired()) {
             authCodeRepository.deleteByEmail(request.getEmail());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "인증 코드가 만료되었습니다.");
@@ -54,11 +48,6 @@ public class PasswordChangeServiceImpl implements PasswordChangeService {
         if (!findCode.getCode().equals(request.getCode())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 인증 코드입니다.");
         }
-
-        if (request.getPassword() == null || request.getPassword().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "새 비밀번호가 존재하지 않습니다.");
-        }
-
         updatePassword(request.getPassword(), request.getEmail());
         authCodeRepository.deleteByEmail(request.getEmail());
     }
