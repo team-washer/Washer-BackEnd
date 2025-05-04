@@ -21,7 +21,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MariaDBDialect
@@ -30,6 +30,7 @@ spring:
         show_sql: true
 
 jwt:
-  access: 1800000
-  refresh: 259200000
-  secret: ${JWT_SECRET}
+  accessTokenKey: ${JWT_ACCESS_TOKEN_KEY}
+  accessTokenExpires: 1800000
+  refreshTokenKey: ${JWT_REFRESH_TOKEN_KEY}
+  refreshTokenExpires: 259200000
