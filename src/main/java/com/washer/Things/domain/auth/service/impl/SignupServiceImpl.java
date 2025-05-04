@@ -19,6 +19,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -32,8 +33,9 @@ public class SignupServiceImpl implements SignupService {
     private final AuthCodeRepository authCodeRepository;
     @Transactional
     public void sendSignupMail(AuthCodeRequest request) {
-        if(userRepository.existsUserByEmail(request.getEmail()))
-            throw new HttpException(HttpStatus.BAD_REQUEST, "이미 해당 메일을 사용하는 유저가 존재합니다.");
+        if(userRepository.existsUserByEmail(request.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 해당 메일을 사용하는 유저가 존재합니다.");
+        }
         authCodeRepository.deleteByEmail(request.getEmail());
         AuthCode authCode = authCodeRepository.save(new AuthCode(request, VerifyCodeType.SIGNUP));
         SimpleMailMessage mailMessage = new SimpleMailMessage();
@@ -46,14 +48,16 @@ public class SignupServiceImpl implements SignupService {
     public void emailVerify(EmailVerifyRequest request) {
         AuthCode code = authCodeRepository.findByEmail(request.getEmail());
         if (code == null) {
-            throw new RuntimeException("인증 코드가 존재하지 않습니다.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "인증 코드가 존재하지 않습니다.");
         }
+
         if (code.isAuthCodeExpired()) {
             authCodeRepository.deleteByEmail(request.getEmail());
-            throw new RuntimeException("인증 코드가 만료되었습니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "인증 코드가 만료되었습니다.");
         }
+
         if (!code.getCode().equals(request.getCode())) {
-            throw new RuntimeException("잘못된 인증 코드입니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 인증 코드입니다.");
         }
         User user = User.builder()
                 .email(request.getEmail())
@@ -66,18 +70,18 @@ public class SignupServiceImpl implements SignupService {
     @Transactional
     public void signup(SignupRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "없는 유저 입니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "없는 유저 입니다."));
 
         if (user.getPassword() != null || user.getName() != null) {
-            throw new HttpException(HttpStatus.BAD_REQUEST, "이미 회원가입을 완료한 유저입니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 회원가입을 완료한 유저입니다.");
         }
 
         if(!user.isEmailVerifyStatus()) {
-            throw new HttpException(HttpStatus.BAD_REQUEST, "인증되지 않은 유저입니다");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "인증되지 않은 유저입니다.");
         }
 
         Room room = roomRepository.findByName(request.getRoom())
-                .orElseThrow(() -> new HttpException(HttpStatus.BAD_REQUEST, "존재하지 않는 방입니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "존재하지 않는 방입니다."));
 
         user.setName(request.getName());
         user.setPassword(passwordEncoder.encode(request.getPassword()));

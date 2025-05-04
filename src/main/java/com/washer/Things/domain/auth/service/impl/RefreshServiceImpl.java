@@ -3,11 +3,12 @@ package com.washer.Things.domain.auth.service.impl;
 import com.washer.Things.domain.auth.presentation.dto.response.ReissueTokenResponse;
 import com.washer.Things.domain.auth.service.RefreshService;
 import com.washer.Things.global.entity.JwtType;
-import com.washer.Things.global.exception.enums.ExceptionEnum;
 import com.washer.Things.global.security.jwt.JwtProvider;
 import com.washer.Things.global.security.jwt.dto.JwtDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +19,7 @@ public class RefreshServiceImpl implements RefreshService {
         Long currentUserId = Long.parseLong(jwtProvider.getIdByRefreshToken(resolveRefreshToken));
 
         if (!jwtProvider.validateToken(resolveRefreshToken, JwtType.REFRESH_TOKEN)) {
-            throw ExceptionEnum.AUTH_EXPIRED_TOKEN.toHttpException();
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "만료된 또는 잘못된 리프레시 토큰입니다.");
         }
 
         JwtDetails newAccessToken = jwtProvider.generateToken(currentUserId, JwtType.ACCESS_TOKEN);
