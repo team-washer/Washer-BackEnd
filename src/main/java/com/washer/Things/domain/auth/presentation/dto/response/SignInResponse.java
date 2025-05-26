@@ -1,5 +1,5 @@
 package com.washer.Things.domain.auth.presentation.dto.response;
-import com.washer.Things.domain.user.entity.Role;
+import com.washer.Things.domain.user.entity.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

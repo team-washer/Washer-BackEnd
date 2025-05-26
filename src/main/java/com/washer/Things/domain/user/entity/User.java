@@ -2,9 +2,13 @@ package com.washer.Things.domain.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.washer.Things.domain.room.entity.Room;
+import com.washer.Things.domain.user.entity.enums.Gender;
+import com.washer.Things.domain.user.entity.enums.Role;
 import com.washer.Things.domain.user.util.StringListConverter;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Table(name = "user")
@@ -26,7 +30,8 @@ public class User {
 
     private String schoolNumber;
 
-    private String gender;
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
     @Column(name = "email_verify_status", columnDefinition = "TINYINT(1)")
     private boolean emailVerifyStatus;
@@ -36,6 +41,18 @@ public class User {
 
     @Convert(converter = StringListConverter.class)
     private List<Role> roles;
+
+    @Column(name = "restricted_until")
+    private LocalDateTime restrictedUntil;
+
+    @Column(name = "restriction_reason")
+    private String restrictionReason;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Reservation> reservations = new ArrayList<>();
+
+    @OneToMany(mappedBy = "reportedBy", cascade = CascadeType.ALL)
+    private List<MachineReport> reports = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "room_id")

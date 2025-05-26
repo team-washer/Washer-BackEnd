@@ -1,6 +1,6 @@
 package com.washer.Things.global.auth;
 
-import com.washer.Things.domain.user.entity.Role;
+import com.washer.Things.domain.user.entity.enums.Role;
 import com.washer.Things.domain.user.repository.UserRepository;
 import com.washer.Things.global.entity.UserCredential;
 import lombok.RequiredArgsConstructor;

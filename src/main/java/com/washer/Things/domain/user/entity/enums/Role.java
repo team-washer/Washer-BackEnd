@@ -1,4 +1,4 @@
-package com.washer.Things.domain.user.entity;
+package com.washer.Things.domain.user.entity.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 @Getter
