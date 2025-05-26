@@ -34,3 +34,9 @@ jwt:
   accessTokenExpires: 1800000
   refreshTokenKey: ${JWT_REFRESH_TOKEN_KEY}
   refreshTokenExpires: 259200000
+
+smartthings:
+  api:
+    base-url: ${SMARTTHINGS_BASEURL}
+    access-token: ${SMARTTHINGS_KEY}
+
