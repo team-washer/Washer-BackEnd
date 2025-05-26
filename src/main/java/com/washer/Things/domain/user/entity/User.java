@@ -7,8 +7,9 @@ import com.washer.Things.domain.user.entity.enums.Role;
 import com.washer.Things.domain.user.util.StringListConverter;
 import jakarta.persistence.*;
 import lombok.*;
-
+import com.washer.Things.domain.machineReport.entity.MachineReport;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Table(name = "user")
