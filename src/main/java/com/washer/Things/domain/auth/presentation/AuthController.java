@@ -4,8 +4,11 @@ package com.washer.Things.domain.auth.presentation;
 import com.washer.Things.domain.auth.presentation.dto.request.*;
 import com.washer.Things.domain.auth.presentation.dto.response.ReissueTokenResponse;
 import com.washer.Things.domain.auth.presentation.dto.response.SignInResponse;
+import com.washer.Things.domain.auth.presentation.dto.response.UserResponse;
 import com.washer.Things.domain.auth.service.*;
+import com.washer.Things.global.exception.dto.response.ApiResponse;
 import com.washer.Things.global.security.jwt.JwtProvider;
+import com.washer.Things.global.util.UserUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,44 +23,54 @@ public class AuthController {
     private final RefreshService refreshService;
     private final PasswordChangeService passwordChangeService;
     private final JwtProvider jwtProvider;
-    private final GetUser getUser;
+    private final UserUtil userUtil;
 
     @PostMapping("/signup")
-    public void signup(@RequestBody @Valid SignupRequest request) {
+    public ResponseEntity<ApiResponse<Void>> signup(@RequestBody @Valid SignupRequest request) {
         signupService.signup(request);
+        return ResponseEntity.ok(ApiResponse.success("회원가입 성공"));
     }
 
     @PostMapping("/signup/mailsend")
-    public void signupMailSend(@RequestBody @Valid AuthCodeRequest request){
+    public ResponseEntity<ApiResponse<Void>> signupMailSend(@RequestBody @Valid AuthCodeRequest request) {
         signupService.sendSignupMail(request);
+        return ResponseEntity.ok(ApiResponse.success("회원가입 이메일 발송 성공"));
     }
 
     @PostMapping("/signup/emailverify")
-    public void signupEmailVerify(@RequestBody @Valid EmailVerifyRequest request){
+    public ResponseEntity<ApiResponse<Void>> signupEmailVerify(@RequestBody @Valid EmailVerifyRequest request) {
         signupService.emailVerify(request);
+        return ResponseEntity.ok(ApiResponse.success("이메일 인증 성공"));
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<SignInResponse> signin(@RequestBody @Valid SigninRequest request) {
+    public ResponseEntity<ApiResponse<SignInResponse>> signin(@RequestBody @Valid SigninRequest request) {
         SignInResponse response = signinService.execute(request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.success(response, "로그인 성공"));
     }
 
     @PostMapping("/reissue")
-    public ReissueTokenResponse reissueToken(@RequestHeader("Refresh-Token") String refreshHeader) {
+    public ResponseEntity<ApiResponse<ReissueTokenResponse>> reissueToken(@RequestHeader("Refresh-Token") String refreshHeader) {
         String refreshToken = jwtProvider.resolveToken(refreshHeader);
-        return refreshService.execute(refreshToken);
+        ReissueTokenResponse response = refreshService.execute(refreshToken);
+        return ResponseEntity.ok(ApiResponse.success(response, "토큰 재발급 성공"));
     }
 
-    @PostMapping( "/pwchange/mailsend")
-    public void mailSend(@RequestBody @Valid AuthCodeRequest request){
+    @PostMapping("/pwchange/mailsend")
+    public ResponseEntity<ApiResponse<Void>> mailSend(@RequestBody @Valid AuthCodeRequest request) {
         passwordChangeService.sendMail(request);
+        return ResponseEntity.ok(ApiResponse.success("비밀번호 변경 메일 발송 성공"));
     }
 
     @PostMapping("/pwchange")
-    public void mailCheck(@RequestBody @Valid PasswordChangeRequest request) {
+    public ResponseEntity<ApiResponse<Void>> mailCheck(@RequestBody @Valid PasswordChangeRequest request) {
         passwordChangeService.passwordChange(request);
+        return ResponseEntity.ok(ApiResponse.success("비밀번호 변경 성공"));
     }
 
-
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<UserResponse>> me() {
+        UserResponse userResponse = userUtil.getUserInfo();
+        return ResponseEntity.ok(ApiResponse.success(userResponse, "내 정보 조회 성공"));
+    }
 }

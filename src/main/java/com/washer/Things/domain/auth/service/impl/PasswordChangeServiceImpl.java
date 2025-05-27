@@ -8,6 +8,7 @@ import com.washer.Things.domain.auth.repository.AuthCodeRepository;
 import com.washer.Things.domain.auth.service.PasswordChangeService;
 import com.washer.Things.domain.user.entity.User;
 import com.washer.Things.domain.user.repository.UserRepository;
+import com.washer.Things.global.exception.HttpException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,7 +16,6 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 
 @Service
@@ -42,11 +42,11 @@ public class PasswordChangeServiceImpl implements PasswordChangeService {
         AuthCode findCode = authCodeRepository.findByEmail(request.getEmail());
         if (findCode.isAuthCodeExpired()) {
             authCodeRepository.deleteByEmail(request.getEmail());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "인증 코드가 만료되었습니다.");
+            throw new HttpException("AUTH_CODE_EXPIRED",HttpStatus.BAD_REQUEST, "인증 코드가 만료되었습니다.");
         }
 
         if (!findCode.getCode().equals(request.getCode())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 인증 코드입니다.");
+            throw new HttpException("INVALID_AUTH_CODE",HttpStatus.BAD_REQUEST, "잘못된 인증 코드입니다.");
         }
         updatePassword(request.getPassword(), request.getEmail());
         authCodeRepository.deleteByEmail(request.getEmail());
@@ -54,7 +54,7 @@ public class PasswordChangeServiceImpl implements PasswordChangeService {
 
     private void updatePassword(String newPassword, String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 이메일의 사용자가 존재하지 않습니다."));
+                .orElseThrow(() -> new HttpException("USER_NOT_FOUND",HttpStatus.NOT_FOUND, "해당 이메일의 사용자가 존재하지 않습니다."));
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
