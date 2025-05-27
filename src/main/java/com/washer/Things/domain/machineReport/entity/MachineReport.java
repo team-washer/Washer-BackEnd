@@ -41,6 +41,7 @@ public class MachineReport {
 
     private LocalDateTime resolvedAt;
 
-    public enum ReportStatus { pending, in_progress, resolved }
-
+    public enum ReportStatus {
+        pending, in_progress, resolved
+    }
 }

@@ -43,8 +43,15 @@ public class Machine {
     @OneToMany(mappedBy = "machine", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reservation> reservations;
 
-    public enum MachineType { washing, dryer }
-    public enum Floor { _3F, _4F, _5F }
-    public enum MachineStatus { available, in_use, reserved }
+    public enum MachineType {
+        washing, dryer
+    }
 
+    public enum Floor {
+        _3F, _4F, _5F
+    }
+
+    public enum MachineStatus {
+        available, in_use, reserved
+    }
 }
