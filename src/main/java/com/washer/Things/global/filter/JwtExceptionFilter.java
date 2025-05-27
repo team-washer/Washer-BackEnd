@@ -14,6 +14,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.util.Collections;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -22,18 +25,28 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
     private final ObjectMapper objectMapper;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
         try {
-            filterChain.doFilter(httpServletRequest, httpServletResponse);
-        } catch(HttpException e){
-            httpServletResponse.setStatus(e.getStatusCode().value());
-            httpServletResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            httpServletResponse.setCharacterEncoding("UTF-8");
+            filterChain.doFilter(request, response);
+        } catch (HttpException e) {
+            response.setStatus(e.getStatusCode().value());
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setCharacterEncoding("UTF-8");
 
-            FilterExceptionResponse response = new FilterExceptionResponse(e.getStatusCode().value(), e.getMessage());
-            log.error("{}", objectMapper.writeValueAsString(response));
+            Map<String, Object> error = Map.of(
+                    "code", e.getCode(),
+                    "message", e.getMessage(),
+                    "details", Collections.emptyMap()
+            );
 
-            objectMapper.writeValue(httpServletResponse.getWriter(), response);
+            FilterExceptionResponse errorResponse = new FilterExceptionResponse(
+                    false,
+                    error,
+                    Instant.now().toString()
+            );
+
+            response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
         }
     }
 }

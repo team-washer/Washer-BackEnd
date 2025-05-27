@@ -4,10 +4,7 @@ package com.washer.Things.domain.auth.presentation;
 import com.washer.Things.domain.auth.presentation.dto.request.*;
 import com.washer.Things.domain.auth.presentation.dto.response.ReissueTokenResponse;
 import com.washer.Things.domain.auth.presentation.dto.response.SignInResponse;
-import com.washer.Things.domain.auth.service.PasswordChangeService;
-import com.washer.Things.domain.auth.service.RefreshService;
-import com.washer.Things.domain.auth.service.SigninService;
-import com.washer.Things.domain.auth.service.SignupService;
+import com.washer.Things.domain.auth.service.*;
 import com.washer.Things.global.security.jwt.JwtProvider;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +20,7 @@ public class AuthController {
     private final RefreshService refreshService;
     private final PasswordChangeService passwordChangeService;
     private final JwtProvider jwtProvider;
+    private final GetUser getUser;
 
     @PostMapping("/signup")
     public void signup(@RequestBody @Valid SignupRequest request) {
@@ -60,4 +58,6 @@ public class AuthController {
     public void mailCheck(@RequestBody @Valid PasswordChangeRequest request) {
         passwordChangeService.passwordChange(request);
     }
+
+
 }

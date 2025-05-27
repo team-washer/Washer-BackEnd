@@ -1,7 +1,6 @@
 package com.washer.Things.global.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.washer.Things.global.exception.ExceptionResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +12,9 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.util.Collections;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -23,9 +25,15 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
         HttpStatus forbidden = HttpStatus.FORBIDDEN;
 
-        String responseString = objectMapper.writeValueAsString(
-                new ExceptionResponse(forbidden.value(), "해당 엔드포인트에 대한 권한이 없습니다.")
-        );
+        String responseString = objectMapper.writeValueAsString(Map.of(
+                "success", false,
+                "error", Map.of(
+                        "code", "FORBIDDEN",
+                        "message", "해당 엔드포인트에 대한 권한이 없습니다.",
+                        "details", Collections.emptyMap()
+                ),
+                "timestamp", Instant.now().toString()
+        ));
 
         log.error("{}", responseString);
 

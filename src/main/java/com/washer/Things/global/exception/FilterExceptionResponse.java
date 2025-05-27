@@ -3,10 +3,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class FilterExceptionResponse {
-    Integer status;
-    String message;
+    boolean success;
+    Map<String, Object> error;
+    String timestamp;
 }

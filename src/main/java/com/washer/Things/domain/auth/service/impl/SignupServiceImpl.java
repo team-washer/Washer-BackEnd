@@ -8,6 +8,7 @@ import com.washer.Things.domain.room.entity.Room;
 import com.washer.Things.domain.auth.presentation.dto.request.SignupRequest;
 import com.washer.Things.domain.auth.service.SignupService;
 import com.washer.Things.domain.room.repository.RoomRepository;
+import com.washer.Things.domain.user.entity.enums.Gender;
 import com.washer.Things.domain.user.entity.enums.Role;
 import com.washer.Things.domain.user.entity.User;
 import com.washer.Things.domain.user.repository.UserRepository;
@@ -82,7 +83,7 @@ public class SignupServiceImpl implements SignupService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setSchoolNumber(request.getSchoolNumber());
         user.setRoles(List.of(Role.ROLE_USER));
-        user.setGender(request.getGender());
+        user.setGender(Gender.valueOf(request.getGender()));
         user.setRoom(room);
         userRepository.save(user);
     }

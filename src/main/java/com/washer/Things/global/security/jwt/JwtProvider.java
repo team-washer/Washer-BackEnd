@@ -3,11 +3,11 @@ package com.washer.Things.global.security.jwt;
 import com.washer.Things.global.auth.AuthDetailsService;
 import com.washer.Things.global.entity.JwtType;
 import com.washer.Things.global.exception.HttpException;
-import com.washer.Things.global.exception.enums.ExceptionEnum;
 import com.washer.Things.global.security.jwt.dto.JwtDetails;
 import com.washer.Things.global.util.DateUtil;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -59,7 +59,7 @@ public class JwtProvider {
 
     public Claims getPayload(String token, JwtType jwtType) {
         if (token == null) {
-            throw ExceptionEnum.AUTH_EMPTY_TOKEN.toHttpException();
+            throw new HttpException("AUTH_EMPTY_TOKEN", HttpStatus.BAD_REQUEST, "토큰이 존재하지 않습니다.");
         }
 
         String tokenKey = jwtType == JwtType.ACCESS_TOKEN
@@ -77,15 +77,16 @@ public class JwtProvider {
                     .parseSignedClaims(token)
                     .getPayload();
         } catch (ExpiredJwtException e) {
-            throw ExceptionEnum.AUTH_EXPIRED_TOKEN.toHttpException();
+            throw new HttpException("AUTH_EXPIRED_TOKEN", HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다.");
         } catch (UnsupportedJwtException e) {
-            throw ExceptionEnum.AUTH_UNSUPPORTED_TOKEN.toHttpException();
+            throw new HttpException("AUTH_UNSUPPORTED_TOKEN", HttpStatus.BAD_REQUEST, "지원하지 않는 토큰입니다.");
         } catch (MalformedJwtException e) {
-            throw ExceptionEnum.AUTH_MALFORMED_TOKEN.toHttpException();
+            throw new HttpException("AUTH_MALFORMED_TOKEN", HttpStatus.BAD_REQUEST, "잘못된 형식의 토큰입니다.");
         } catch (RuntimeException e) {
-            throw ExceptionEnum.AUTH_OTHER_TOKEN.toHttpException();
+            throw new HttpException("AUTH_OTHER_TOKEN", HttpStatus.INTERNAL_SERVER_ERROR, "기타 JWT 토큰 오류입니다.");
         }
     }
+
 
     public JwtDetails generateToken(Long id, JwtType jwtType) {
         long tokenExpires = jwtType == JwtType.ACCESS_TOKEN

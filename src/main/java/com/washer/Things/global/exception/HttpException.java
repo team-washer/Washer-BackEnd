@@ -5,10 +5,13 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor
-public class HttpException extends RuntimeException{
-    HttpStatus statusCode;
-    String message;
-    public Throwable fillInStackTrace(){
+public class HttpException extends RuntimeException {
+    private final String code;
+    private final HttpStatus statusCode;
+    private final String message;
+
+    @Override
+    public Throwable fillInStackTrace() {
         return this;
     }
 }
