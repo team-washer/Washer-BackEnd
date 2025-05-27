@@ -3,7 +3,7 @@ package com.washer.Things.global.security.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.washer.Things.global.filter.JwtExceptionFilter;
 import com.washer.Things.global.filter.JwtFilter;
-import com.washer.Things.global.handler.CustomAccessDeniedHandler;
+import com.washer.Things.global.exception.handler.CustomAccessDeniedHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-package com.washer.Things.global.handler;
+package com.washer.Things.global.exception.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
