@@ -5,6 +5,7 @@ import com.washer.Things.domain.smartThingsToken.presentation.dto.response.Smart
 import com.washer.Things.domain.smartThingsToken.repository.SmartThingsTokenRepository;
 import com.washer.Things.domain.smartThingsToken.service.SmartThingsTokenService;
 import com.washer.Things.global.exception.HttpException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -22,18 +23,19 @@ public class SmartThingsTokenServiceImpl implements SmartThingsTokenService {
     private final SmartThingsTokenRepository tokenRepository;
     private final WebClient webClient;
 
-    @Value("${smartthings.client-id}")
+    @Value("${spring.security.oauth2.client.registration.smartthings.client-id}")
     private String clientId;
 
-    @Value("${smartthings.client-secret}")
+    @Value("${spring.security.oauth2.client.registration.smartthings.client-secret}")
     private String clientSecret;
 
-    @Value("${smartthings.redirect-uri}")
+    @Value("${spring.security.oauth2.client.registration.smartthings.redirect-uri}")
     private String redirectUri;
 
-    @Value("${smartthings.token-uri}")
+    @Value("${spring.security.oauth2.client.registration.smartthings.token-uri}")
     private String tokenUri;
 
+    @Transactional
     public void saveToken(SmartThingsTokenResponse tokenResponse) {
         tokenRepository.deleteAll();
 
@@ -50,6 +52,7 @@ public class SmartThingsTokenServiceImpl implements SmartThingsTokenService {
         tokenRepository.save(token);
     }
 
+    @Transactional
     public SmartThingsTokenResponse exchangeCode(String code) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("grant_type", "authorization_code");
@@ -66,6 +69,7 @@ public class SmartThingsTokenServiceImpl implements SmartThingsTokenService {
                 .bodyToMono(SmartThingsTokenResponse.class)
                 .block();
     }
+    @Transactional
     public void refreshTokenIfNeeded() {
         SmartThingsToken token = tokenRepository.findTopByOrderByIdAsc().orElse(null);
         if (token == null) {
@@ -80,6 +84,7 @@ public class SmartThingsTokenServiceImpl implements SmartThingsTokenService {
         }
     }
 
+    @Transactional
     public void refreshAccessToken(String refreshToken) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("grant_type", "refresh_token");
@@ -111,6 +116,7 @@ public class SmartThingsTokenServiceImpl implements SmartThingsTokenService {
         }
     }
 
+    @Transactional
     public String getMyDevices() {
         refreshTokenIfNeeded();
 
@@ -124,6 +130,7 @@ public class SmartThingsTokenServiceImpl implements SmartThingsTokenService {
                 .block();
     }
 
+    @Transactional
     public SmartThingsToken getToken() {
         return tokenRepository.findTopByOrderByIdAsc()
                 .orElseThrow(() -> new HttpException("NO_TOKEN", HttpStatus.NOT_FOUND, "SmartThings 토큰이 존재하지 않습니다."));
