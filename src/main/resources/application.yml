@@ -41,8 +41,8 @@ spring:
             scope: r:devices:* w:devices:* x:devices:*
         provider:
           smartthings:
-            authorization-uri: https://auth-global.api.smartthings.com/oauth/authorize
-            token-uri: https://auth-global.api.smartthings.com/oauth/token
+            authorization-uri: https://api.smartthings.com/oauth/authorize
+            token-uri: https://api.smartthings.com/oauth/token
 
 jwt:
   accessTokenKey: ${JWT_ACCESS_TOKEN_KEY}
