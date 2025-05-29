@@ -42,8 +42,21 @@ public class SmartThingsTokenController {
         }
 
         switch (lifecycle) {
+            case "PING":
+                Map<String, Object> pingData = (Map<String, Object>) payload.get("pingData");
+                if (pingData == null || !pingData.containsKey("challenge")) {
+                    log.warn("PING payload missing challenge");
+                    return ResponseEntity.badRequest().body(Map.of("error", "challenge missing"));
+                }
+                String challenge = (String) pingData.get("challenge");
+                return ResponseEntity.ok(Map.of("pingData", Map.of("challenge", challenge)));
+
             case "CONFIRMATION":
                 Map<String, Object> confirmationData = (Map<String, Object>) payload.get("confirmationData");
+                if (confirmationData == null || !confirmationData.containsKey("confirmationUrl")) {
+                    log.warn("CONFIRMATION payload missing confirmationUrl");
+                    return ResponseEntity.badRequest().body(Map.of("error", "confirmationUrl missing"));
+                }
                 String confirmationUrl = (String) confirmationData.get("confirmationUrl");
 
                 log.info("Sending GET to confirmationUrl: {}", confirmationUrl);
