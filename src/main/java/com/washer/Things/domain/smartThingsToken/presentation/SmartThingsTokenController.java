@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.washer.Things.domain.smartThingsToken.presentation.dto.response.SmartThingsTokenResponse;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import java.util.Map;
 @RequestMapping("/oauth")
 public class SmartThingsTokenController {
     private final SmartThingsTokenService smartThingsTokenService;
+    private final WebClient webClient;
     @GetMapping("/devices")
     public ResponseEntity<ApiResponse<String>> getMyDevices() {
         String devices = smartThingsTokenService.getMyDevices();
@@ -40,21 +42,20 @@ public class SmartThingsTokenController {
         }
 
         switch (lifecycle) {
-            case "PING":
-                return ResponseEntity.ok(Map.of("pingData", Map.of("status", "OK")));
+            case "CONFIRMATION":
+                Map<String, Object> confirmationData = (Map<String, Object>) payload.get("confirmationData");
+                String confirmationUrl = (String) confirmationData.get("confirmationUrl");
 
-            case "INSTALL":
-                // 설치 시 초기화 작업 등 필요하면 수행
-                return ResponseEntity.ok(Map.of("installData", Map.of("state", "COMPLETE")));
+                log.info("Sending GET to confirmationUrl: {}", confirmationUrl);
 
-            case "UPDATE":
-                // 업데이트 시 처리
-                return ResponseEntity.ok(Map.of("updateData", Map.of("state", "COMPLETE")));
+                webClient.get()
+                        .uri(confirmationUrl)
+                        .retrieve()
+                        .bodyToMono(String.class)
+                        .doOnSuccess(response -> log.info("Confirmation success: {}", response))
+                        .doOnError(error -> log.error("Confirmation failed", error))
+                        .subscribe();
 
-            case "EVENT":
-                // 이벤트 처리 로직 필요하면 작성
-                // 예: event 데이터 로그 출력 또는 내부 처리 호출
-                log.info("EVENT received: {}", payload.get("event"));
                 return ResponseEntity.ok().build();
 
             default:
@@ -62,4 +63,5 @@ public class SmartThingsTokenController {
                 return ResponseEntity.badRequest().body(Map.of("error", "Unknown lifecycle"));
         }
     }
+
 }
