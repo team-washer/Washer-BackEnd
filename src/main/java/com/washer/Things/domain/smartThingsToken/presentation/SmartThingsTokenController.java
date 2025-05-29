@@ -61,13 +61,18 @@ public class SmartThingsTokenController {
 
                 log.info("Sending GET to confirmationUrl: {}", confirmationUrl);
 
-                webClient.get()
-                        .uri(confirmationUrl)
-                        .retrieve()
-                        .bodyToMono(String.class)
-                        .doOnSuccess(response -> log.info("Confirmation success: {}", response))
-                        .doOnError(error -> log.error("Confirmation failed", error))
-                        .subscribe();
+                try {
+                    String response = webClient.get()
+                            .uri(confirmationUrl)
+                            .retrieve()
+                            .bodyToMono(String.class)
+                            .block();  // 동기 호출
+
+                    log.info("Confirmation success: {}", response);
+                } catch (Exception e) {
+                    log.error("Confirmation failed", e);
+                    return ResponseEntity.status(500).body(Map.of("error", "Confirmation failed"));
+                }
 
                 return ResponseEntity.ok().build();
 
@@ -76,5 +81,6 @@ public class SmartThingsTokenController {
                 return ResponseEntity.badRequest().body(Map.of("error", "Unknown lifecycle"));
         }
     }
+
 
 }
