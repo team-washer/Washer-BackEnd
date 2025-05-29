@@ -1,4 +1,4 @@
-package com.washer.Things.global.entity;
+package com.washer.Things.domain.smartThingsToken.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -19,13 +19,10 @@ public class SmartThingsToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String userId; // 사용자 식별용(로그인 유저 아이디)
-
     private String accessToken;
 
     private String refreshToken;
 
-    private Instant tokenIssuedAt;
-
-    private Instant accessTokenExpiresAt;
+    private Instant issuedAt;  //토킄 생성일
+    private Instant expiresAt;  //어세스 만료시간
 }
