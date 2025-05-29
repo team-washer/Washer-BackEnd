@@ -32,7 +32,7 @@ public class SmartThingsTokenServiceImpl implements SmartThingsTokenService {
     @Value("${spring.security.oauth2.client.registration.smartthings.redirect-uri}")
     private String redirectUri;
 
-    @Value("${spring.security.oauth2.client.registration.smartthings.token-uri}")
+    @Value("${spring.security.oauth2.client.provider.smartthings.token-uri}")
     private String tokenUri;
 
     @Transactional
