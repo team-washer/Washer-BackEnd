@@ -25,7 +25,7 @@ public class SmartThingsToken {
 
     private String refreshToken;
 
-    private Instant issuedAt;
+    private Instant tokenIssuedAt;
 
-    private Instant expiresAt;
+    private Instant accessTokenExpiresAt;
 }
