@@ -74,13 +74,13 @@ public class SmartThingsTokenController {
                     return ResponseEntity.status(500).body(Map.of("error", "Confirmation failed"));
                 }
 
-                return ResponseEntity.ok().build();
+                // 성공 시 빈 객체 응답
+                return ResponseEntity.ok(Map.of());
 
             default:
                 log.warn("Unknown lifecycle: {}", lifecycle);
                 return ResponseEntity.badRequest().body(Map.of("error", "Unknown lifecycle"));
         }
     }
-
 
 }
