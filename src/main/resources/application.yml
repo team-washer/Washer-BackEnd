@@ -5,7 +5,7 @@ spring:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: org.mariadb.jdbc.Driver
 
   mail:
     properties:
@@ -41,12 +41,11 @@ spring:
             scope: r:devices:* w:devices:* x:devices:*
         provider:
           smartthings:
-            authorization-uri: ${BASEURL}/oauth/authorize
-            token-uri: ${BASEURL}/oauth/refresh
+            authorization-uri: auth-global.api.smartthings.com/oauth/authorize
+            token-uri: auth-global.api.smartthings.com/oauth/refresh
 
 jwt:
   accessTokenKey: ${JWT_ACCESS_TOKEN_KEY}
   accessTokenExpires: 1800000
   refreshTokenKey: ${JWT_REFRESH_TOKEN_KEY}
   refreshTokenExpires: 259200000
-
