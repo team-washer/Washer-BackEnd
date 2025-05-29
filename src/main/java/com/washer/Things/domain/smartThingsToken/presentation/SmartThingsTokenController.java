@@ -31,7 +31,7 @@ public class SmartThingsTokenController {
         return ResponseEntity.ok(ApiResponse.success("SmartThings 인증 및 토큰 저장 성공"));
     }
 
-    @PostMapping("/smartapp")
+    @GetMapping("/smartapp")
     public ResponseEntity<Object> handleSmartAppWebhook(@RequestBody Map<String, Object> payload) {
         log.info("SmartApp Webhook payload received: {}", payload);
 
@@ -74,7 +74,6 @@ public class SmartThingsTokenController {
                     return ResponseEntity.status(500).body(Map.of("error", "Confirmation failed"));
                 }
 
-                // 성공 시 빈 객체 응답
                 return ResponseEntity.ok(Map.of());
 
             default:
