@@ -2,6 +2,8 @@ package com.washer.Things.global.exception.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
+import org.springframework.http.HttpStatus;
+
 import java.time.Instant;
 
 @Getter
@@ -44,19 +46,19 @@ public class ApiResponse<T> {
     }
 
     // 에러 응답 생성
-    public static ApiResponse<Void> error(String code, String message) {
+    public static ApiResponse<Void> error(HttpStatus statusCode, String message) {
         return ApiResponse.<Void>builder()
                 .success(false)
-                .error(new ApiError(code, message, null))
+                .error(new ApiError(statusCode, message, null))
                 .message(message)
                 .timestamp(Instant.now())
                 .build();
     }
 
-    public static ApiResponse<Void> error(String code, String message, Object details) {
+    public static ApiResponse<Void> error(HttpStatus statusCode, String message, Object details) {
         return ApiResponse.<Void>builder()
                 .success(false)
-                .error(new ApiError(code, message, details))
+                .error(new ApiError(statusCode, message, details))
                 .message(message)
                 .timestamp(Instant.now())
                 .build();
@@ -66,7 +68,7 @@ public class ApiResponse<T> {
     @Builder
     @AllArgsConstructor
     public static class ApiError {
-        private final String code;
+        private final HttpStatus statusCode;
         private final String message;
 
         @JsonInclude(JsonInclude.Include.NON_NULL)

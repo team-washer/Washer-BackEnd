@@ -7,6 +7,7 @@ import com.washer.Things.domain.smartThingsToken.service.SmartThingsTokenService
 import com.washer.Things.global.exception.HttpException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -57,18 +58,17 @@ public class SmartThingsTokenServiceImpl implements SmartThingsTokenService {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("grant_type", "authorization_code");
         formData.add("code", code);
-        formData.add("client_id", clientId);
-        formData.add("client_secret", clientSecret);
         formData.add("redirect_uri", redirectUri);
-
         return webClient.post()
                 .uri(tokenUri)
+                .headers(headers -> headers.setBasicAuth(clientId, clientSecret))
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue(formData)
                 .retrieve()
                 .bodyToMono(SmartThingsTokenResponse.class)
                 .block();
     }
+
     @Transactional
     public void refreshTokenIfNeeded() {
         SmartThingsToken token = tokenRepository.findTopByOrderByIdAsc().orElse(null);
@@ -89,11 +89,10 @@ public class SmartThingsTokenServiceImpl implements SmartThingsTokenService {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("grant_type", "refresh_token");
         formData.add("refresh_token", refreshToken);
-        formData.add("client_id", clientId);
-        formData.add("client_secret", clientSecret);
 
         SmartThingsTokenResponse tokenResponse = webClient.post()
                 .uri(tokenUri)
+                .headers(headers -> headers.setBasicAuth(clientId, clientSecret))
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue(formData)
                 .retrieve()
@@ -115,6 +114,7 @@ public class SmartThingsTokenServiceImpl implements SmartThingsTokenService {
             throw new HttpException(HttpStatus.INTERNAL_SERVER_ERROR, "SmartThings 토큰 갱신에 실패했습니다.");
         }
     }
+
 
     @Transactional
     public String getMyDevices() {
