@@ -17,7 +17,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpException.class)
     public ResponseEntity<ApiErrorResponse> handleHttpException(HttpException ex) {
         ApiErrorResponse errorResponse = new ApiErrorResponse(
-                ex.getCode(),
+                ex.getStatusCode(),
                 ex.getMessage(),
                 Map.of()
         );
@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
         String message = ex.getFieldError() != null ? ex.getFieldError().getDefaultMessage() : "Validation error";
         ApiErrorResponse errorResponse = new ApiErrorResponse(
-                "VALIDATION_ERROR",
+                HttpStatus.INTERNAL_SERVER_ERROR,
                 message,
                 Map.of()
         );
@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiErrorResponse> handleDataIntegrityException(DataIntegrityViolationException ex) {
         ApiErrorResponse errorResponse = new ApiErrorResponse(
-                "DATA_INTEGRITY_VIOLATION",
+                HttpStatus.INTERNAL_SERVER_ERROR,
                 "이미 처리된 요청입니다.",
                 Map.of()
         );
@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiErrorResponse> handleException(RuntimeException ex) {
         ApiErrorResponse errorResponse = new ApiErrorResponse(
-                "INTERNAL_SERVER_ERROR",
+                HttpStatus.INTERNAL_SERVER_ERROR,
                 "서버 내부 오류가 발생했습니다.",
                 Map.of("exception", ex.getClass().getSimpleName())
         );

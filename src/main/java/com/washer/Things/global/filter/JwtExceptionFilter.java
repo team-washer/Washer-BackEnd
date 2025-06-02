@@ -35,7 +35,7 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
             response.setCharacterEncoding("UTF-8");
 
             Map<String, Object> error = Map.of(
-                    "code", e.getCode(),
+                    "statusCode", e.getStatusCode(),
                     "message", e.getMessage(),
                     "details", Collections.emptyMap()
             );

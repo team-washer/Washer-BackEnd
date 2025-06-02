@@ -73,7 +73,7 @@ public class SmartThingsTokenServiceImpl implements SmartThingsTokenService {
     public void refreshTokenIfNeeded() {
         SmartThingsToken token = tokenRepository.findTopByOrderByIdAsc().orElse(null);
         if (token == null) {
-            throw new HttpException("NO_TOKEN", HttpStatus.NOT_FOUND, "SmartThings 토큰을 찾을 수 없습니다.");
+            throw new HttpException(HttpStatus.NOT_FOUND, "SmartThings 토큰을 찾을 수 없습니다.");
         }
 
         Instant now = Instant.now();
@@ -112,7 +112,7 @@ public class SmartThingsTokenServiceImpl implements SmartThingsTokenService {
 
             tokenRepository.save(token);
         } else {
-            throw new HttpException("REFRESH_FAILED", HttpStatus.INTERNAL_SERVER_ERROR, "SmartThings 토큰 갱신에 실패했습니다.");
+            throw new HttpException(HttpStatus.INTERNAL_SERVER_ERROR, "SmartThings 토큰 갱신에 실패했습니다.");
         }
     }
 
@@ -133,7 +133,7 @@ public class SmartThingsTokenServiceImpl implements SmartThingsTokenService {
     @Transactional
     public SmartThingsToken getToken() {
         return tokenRepository.findTopByOrderByIdAsc()
-                .orElseThrow(() -> new HttpException("NO_TOKEN", HttpStatus.NOT_FOUND, "SmartThings 토큰이 존재하지 않습니다."));
+                .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "SmartThings 토큰이 존재하지 않습니다."));
     }
 
 }

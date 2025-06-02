@@ -20,7 +20,7 @@ public class UserUtil {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new HttpException("USER_NOT_FOUND",HttpStatus.NOT_FOUND, "해당 유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "해당 유저를 찾을 수 없습니다."));
 
         return UserResponse.builder()
                 .id(user.getId().toString())

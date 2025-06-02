@@ -59,7 +59,7 @@ public class JwtProvider {
 
     public Claims getPayload(String token, JwtType jwtType) {
         if (token == null) {
-            throw new HttpException("AUTH_EMPTY_TOKEN", HttpStatus.BAD_REQUEST, "토큰이 존재하지 않습니다.");
+            throw new HttpException(HttpStatus.BAD_REQUEST, "토큰이 존재하지 않습니다.");
         }
 
         String tokenKey = jwtType == JwtType.ACCESS_TOKEN
@@ -77,13 +77,13 @@ public class JwtProvider {
                     .parseSignedClaims(token)
                     .getPayload();
         } catch (ExpiredJwtException e) {
-            throw new HttpException("AUTH_EXPIRED_TOKEN", HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다.");
+            throw new HttpException(HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다.");
         } catch (UnsupportedJwtException e) {
-            throw new HttpException("AUTH_UNSUPPORTED_TOKEN", HttpStatus.BAD_REQUEST, "지원하지 않는 토큰입니다.");
+            throw new HttpException(HttpStatus.BAD_REQUEST, "지원하지 않는 토큰입니다.");
         } catch (MalformedJwtException e) {
-            throw new HttpException("AUTH_MALFORMED_TOKEN", HttpStatus.BAD_REQUEST, "잘못된 형식의 토큰입니다.");
+            throw new HttpException(HttpStatus.BAD_REQUEST, "잘못된 형식의 토큰입니다.");
         } catch (RuntimeException e) {
-            throw new HttpException("AUTH_OTHER_TOKEN", HttpStatus.INTERNAL_SERVER_ERROR, "기타 JWT 토큰 오류입니다.");
+            throw new HttpException(HttpStatus.INTERNAL_SERVER_ERROR, "기타 JWT 토큰 오류입니다.");
         }
     }
 

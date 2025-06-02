@@ -19,7 +19,7 @@ public class RefreshServiceImpl implements RefreshService {
         Long currentUserId = Long.parseLong(jwtProvider.getIdByRefreshToken(resolveRefreshToken));
 
         if (!jwtProvider.validateToken(resolveRefreshToken, JwtType.REFRESH_TOKEN)) {
-            throw new HttpException("INVALID_REFRESH_TOKEN",HttpStatus.FORBIDDEN, "만료된 또는 잘못된 리프레시 토큰입니다.");
+            throw new HttpException(HttpStatus.FORBIDDEN, "만료된 또는 잘못된 리프레시 토큰입니다.");
         }
 
         JwtDetails newAccessToken = jwtProvider.generateToken(currentUserId, JwtType.ACCESS_TOKEN);

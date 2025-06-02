@@ -24,10 +24,10 @@ public class SigninServiceImpl implements SigninService {
     @Transactional
     public SignInResponse execute(SigninRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new HttpException("USER_NOT_FOUND",HttpStatus.NOT_FOUND, "없는 유저 입니다."));
+                .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "없는 유저 입니다."));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new HttpException("INVALID_PASSWORD",HttpStatus.UNAUTHORIZED, "비밀번호가 틀렸습니다.");
+            throw new HttpException(HttpStatus.UNAUTHORIZED, "비밀번호가 틀렸습니다.");
         }
 
         JwtDetails accessToken = jwtProvider.generateToken(user.getId(), JwtType.ACCESS_TOKEN);
