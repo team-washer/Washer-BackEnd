@@ -18,12 +18,6 @@ import java.util.Map;
 @RequestMapping("/oauth")
 public class SmartThingsTokenController {
     private final SmartThingsTokenService smartThingsTokenService;
-    @GetMapping("/devices")
-    public ResponseEntity<ApiResponse<Map<String, List<Map<String, Object>>>>> getMyDevices() {
-        Map<String, List<Map<String, Object>>> devices = smartThingsTokenService.getMyDevices();
-        return ResponseEntity.ok(ApiResponse.success(devices, "SmartThings 디바이스 조회 성공"));
-    }
-
     @GetMapping("/callback")
     public ResponseEntity<ApiResponse<Void>> callback(@RequestParam("code") String code) {
         SmartThingsTokenResponse tokenResponse = smartThingsTokenService.exchangeCode(code);

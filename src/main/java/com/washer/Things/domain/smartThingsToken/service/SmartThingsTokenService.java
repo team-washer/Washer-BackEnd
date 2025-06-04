@@ -7,7 +7,5 @@ import java.util.Map;
 
 public interface SmartThingsTokenService {
     void saveToken(SmartThingsTokenResponse tokenResponse);
-
-    Map<String, List<Map<String, Object>>> getMyDevices();
     SmartThingsTokenResponse exchangeCode(String code);
 }
