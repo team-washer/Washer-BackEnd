@@ -1,5 +1,7 @@
 package com.washer.Things.domain.smartThingsToken.service.Impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.washer.Things.domain.smartThingsToken.entity.SmartThingsToken;
 import com.washer.Things.domain.smartThingsToken.presentation.dto.response.SmartThingsTokenResponse;
 import com.washer.Things.domain.smartThingsToken.repository.SmartThingsTokenRepository;
@@ -17,6 +19,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -117,17 +123,90 @@ public class SmartThingsTokenServiceImpl implements SmartThingsTokenService {
 
 
     @Transactional
-    public String getMyDevices() {
+    public Map<String, List<Map<String, Object>>> getMyDevices() {
         refreshTokenIfNeeded();
-
         SmartThingsToken token = getToken();
 
-        return webClient.get()
+        String rawResponse = webClient.get()
                 .uri("https://api.smartthings.com/v1/devices")
                 .headers(headers -> headers.setBearerAuth(token.getAccessToken()))
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode items = mapper.readTree(rawResponse).path("items");
+
+            Map<String, List<Map<String, Object>>> result = new HashMap<>();
+
+            for (JsonNode device : items) {
+                String label = device.path("label").asText();
+                String deviceId = device.path("deviceId").asText();
+                String type = getDeviceType(label);
+
+                JsonNode status = getDeviceStatus(token, deviceId);
+                JsonNode main = status.path("components").path("main");
+
+                Map<String, Object> deviceInfo = new HashMap<>();
+                deviceInfo.put("label", label);
+                deviceInfo.put("floor", extractFloorFromLabel(label));
+                deviceInfo.put("powerState", getSafeValue(main, "switch", "switch"));
+
+                if (type.equals("washer")) {
+                    String machineState = getSafeValue(main, "washerOperatingState", "machineState");
+                    String washerJobState = getSafeValue(main, "washerOperatingState", "washerJobState");
+                    deviceInfo.put("machineState", machineState);
+                    deviceInfo.put("washerJobState", washerJobState);
+                } else {
+                    String machineState = getSafeValue(main, "dryerOperatingState", "machineState");
+                    String dryerJobState = getSafeValue(main, "dryerOperatingState", "dryerJobState");
+                    deviceInfo.put("machineState", machineState);
+                    deviceInfo.put("dryerJobState", dryerJobState);
+                }
+
+                deviceInfo.put("remainingTime", getRemainingTime(main, type));
+
+                result.computeIfAbsent(type, k -> new ArrayList<>()).add(deviceInfo);
+            }
+
+            return result;
+
+        } catch (Exception e) {
+            throw new RuntimeException("디바이스 정보 처리 실패", e);
+        }
+    }
+    private String getDeviceType(String label) {
+        return label.toLowerCase().contains("washer") ? "washer" : "dryer";
+    }
+
+    private JsonNode getDeviceStatus(SmartThingsToken token, String deviceId) {
+        return webClient.get()
+                .uri("https://api.smartthings.com/v1/devices/" + deviceId + "/status")
+                .headers(headers -> headers.setBearerAuth(token.getAccessToken()))
+                .retrieve()
+                .bodyToMono(JsonNode.class)
+                .block();
+    }
+
+    private String getSafeValue(JsonNode main, String category, String field) {
+        JsonNode node = main.path(category).path(field).path("value");
+        return node.isMissingNode() ? "unknown" : node.asText();
+    }
+
+    private String getRemainingTime(JsonNode main, String type) {
+        JsonNode node = type.equals("washer")
+                ? main.path("samsungce.washerWashingTime").path("completionTime").path("value")
+                : main.path("samsungce.dryerDryingTime").path("completionTime").path("value");
+
+        return (node.isMissingNode() || node.asText().isEmpty()) ? "none" : node.asText();
+    }
+
+    private String extractFloorFromLabel(String label) {
+        for (String part : label.split("-")) {
+            if (part.matches("\\d+F")) return part;
+        }
+        return "Unknown";
     }
 
     @Transactional

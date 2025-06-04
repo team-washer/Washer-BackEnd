@@ -2,9 +2,12 @@ package com.washer.Things.domain.smartThingsToken.service;
 
 import com.washer.Things.domain.smartThingsToken.presentation.dto.response.SmartThingsTokenResponse;
 
+import java.util.List;
+import java.util.Map;
+
 public interface SmartThingsTokenService {
     void saveToken(SmartThingsTokenResponse tokenResponse);
 
-    String getMyDevices();
+    Map<String, List<Map<String, Object>>> getMyDevices();
     SmartThingsTokenResponse exchangeCode(String code);
 }

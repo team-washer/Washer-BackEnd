@@ -10,14 +10,17 @@ import org.springframework.web.bind.annotation.*;
 import com.washer.Things.domain.smartThingsToken.presentation.dto.response.SmartThingsTokenResponse;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/oauth")
 public class SmartThingsTokenController {
     private final SmartThingsTokenService smartThingsTokenService;
     @GetMapping("/devices")
-    public ResponseEntity<ApiResponse<String>> getMyDevices() {
-        String devices = smartThingsTokenService.getMyDevices();
+    public ResponseEntity<ApiResponse<Map<String, List<Map<String, Object>>>>> getMyDevices() {
+        Map<String, List<Map<String, Object>>> devices = smartThingsTokenService.getMyDevices();
         return ResponseEntity.ok(ApiResponse.success(devices, "SmartThings 디바이스 조회 성공"));
     }
 
