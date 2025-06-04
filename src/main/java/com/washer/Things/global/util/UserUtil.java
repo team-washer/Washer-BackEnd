@@ -31,4 +31,12 @@ public class UserUtil {
                 .restrictionReason(user.getRestrictionReason())
                 .build();
     }
+
+    @Transactional
+    public User getCurrentUser() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "해당 유저를 찾을 수 없습니다."));
+    }
 }
