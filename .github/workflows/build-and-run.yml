@@ -37,7 +37,7 @@ jobs:
         run: |
           for container in $(sudo docker ps -q); do
             name=$(sudo docker inspect --format='{{.Name}}' $container)
-            if [ "$name" != "/dozzle" ]; then
+            if [ "$name" != "/mariadb" ]; then
               sudo docker stop $container
             fi
           done
@@ -45,4 +45,4 @@ jobs:
         run: sudo docker run --name washercontainer --env-file /home/washer/.env --rm -d -p 10000:8080 washercontainer
 
       - name: delete old docker image
-        run: sudo docker system prune -f --filter "label!=dozzle"
+        run: sudo docker system prune -f --filter "label!=mariadb"
