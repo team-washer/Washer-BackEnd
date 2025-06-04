@@ -1,4 +1,4 @@
-package com.washer.Things.domain.machineReport.entity;
+package com.washer.Things.domain.machine.entity;
 
 import com.washer.Things.domain.machine.entity.Machine;
 import com.washer.Things.domain.user.entity.User;

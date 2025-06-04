@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.washer.Things.domain.machine.entity.Machine;
 import com.washer.Things.domain.machine.presentation.dto.response.DeviceInfoResponse;
 import com.washer.Things.domain.machine.repository.MachineRepository;
-import com.washer.Things.domain.machine.service.MachineService;
+import com.washer.Things.domain.machine.service.MachineInfoService;
 import com.washer.Things.domain.smartThingsToken.entity.SmartThingsToken;
 import com.washer.Things.domain.smartThingsToken.service.Impl.SmartThingsTokenServiceImpl;
 import jakarta.transaction.Transactional;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class MachineServiceImpl implements MachineService {
+public class MachineInfoServiceImpl implements MachineInfoService {
     private final SmartThingsTokenServiceImpl smartThingsTokenService;
     private final MachineRepository machineRepository;
     private final WebClient webClient;
@@ -83,7 +83,7 @@ public class MachineServiceImpl implements MachineService {
     }
 
     private void enrichFromEntity(DeviceInfoResponse.DeviceInfoResponseBuilder builder, String label, String typeStr, String floorStr) {
-        Machine.MachineType type = "washer".equals(typeStr) ? Machine.MachineType.washing : Machine.MachineType.dryer;
+        Machine.MachineType type = "washer".equals(typeStr) ? Machine.MachineType.washer : Machine.MachineType.dryer;
         Machine.Floor floor = Machine.Floor.valueOf("_" + floorStr);
 
         machineRepository.findByTypeAndFloorAndLabel(type, floor, label)

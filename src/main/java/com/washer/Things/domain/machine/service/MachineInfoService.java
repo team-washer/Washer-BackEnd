@@ -5,6 +5,6 @@ import com.washer.Things.domain.machine.presentation.dto.response.DeviceInfoResp
 import java.util.List;
 import java.util.Map;
 
-public interface MachineService {
+public interface MachineInfoService {
     Map<String, List<DeviceInfoResponse>> getMyDevices(String filterType, String filterFloor);
 }

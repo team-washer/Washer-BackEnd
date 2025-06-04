@@ -1,7 +1,7 @@
 package com.washer.Things.domain.machine.presentation;
 
 import com.washer.Things.domain.machine.presentation.dto.response.DeviceInfoResponse;
-import com.washer.Things.domain.machine.service.MachineService;
+import com.washer.Things.domain.machine.service.MachineInfoService;
 import com.washer.Things.global.exception.dto.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,13 +16,13 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("/machine")
 public class MachineController {
-    private final MachineService machineService;
+    private final MachineInfoService machineInfoService;
     @GetMapping("/devices")
     public ResponseEntity<ApiResponse<Map<String, List<DeviceInfoResponse>>>> getMyDevices(
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String floor
     ) {
-        Map<String, List<DeviceInfoResponse>> devices = machineService.getMyDevices(type, floor);
+        Map<String, List<DeviceInfoResponse>> devices = machineInfoService.getMyDevices(type, floor);
         return ResponseEntity.ok(ApiResponse.success(devices, "SmartThings 디바이스 조회 성공"));
     }
 }

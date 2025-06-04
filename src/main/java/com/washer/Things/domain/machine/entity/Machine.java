@@ -40,7 +40,7 @@ public class Machine {
     private List<Reservation> reservations;
 
     public enum MachineType {
-        washing, dryer
+        washer, dryer
     }
 
     public enum Floor {
