@@ -44,24 +44,29 @@ public class Reservation {
     private ReservationStatus status;
 
     @Column(nullable = false)
-    private int timeRemaining;
+    private int timeRemaining;      //남은 사용 시간 (분)
 
     @Column(nullable = false)
-    private LocalDateTime startTime;
+    private LocalDateTime startTime;        // 예약 시작 예정 시간
 
-    private LocalDateTime confirmedAt;
-    private LocalDateTime startedAt;
-    private LocalDateTime completedAt;
-    private LocalDateTime collectedAt;
-    private LocalDateTime cancelledAt;
+    private LocalDateTime confirmedAt;      // 사용자 예약 확인 시간
+    private LocalDateTime startedAt;        // 실제 세탁/건조 시작 시간
+    private LocalDateTime completedAt;      // 세탁/건조 완료 시간
+    private LocalDateTime collectedAt;      // 세탁물 수거 완료 시간
+    private LocalDateTime cancelledAt;      // 예약 취소 시간
 
     @Column(columnDefinition = "TEXT")
-    private String message;
-
-    @Column(nullable = false)
-    private int connectionAttempts = 0;
+    private String message;     // 사용자 또는 시스템 메시지
 
     public enum ReservationStatus {
-        reserved, confirmed, running, collection, cancelled, completed, connecting
+        reserved, confirmed, running, collection, cancelled, completed
     }
+    /**
+     * - reserved: 예약됨
+     * - confirmed: 예약 확정 (지금 사용)
+     * - running: 세탁/건조 진행 중
+     * - collection: 사용 완료, 수거 대기 중
+     * - cancelled: 예약 취소됨
+     * - completed: 세탁/건조 및 수거까지 완료됨
+     */
 }

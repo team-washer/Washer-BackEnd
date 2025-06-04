@@ -44,10 +44,10 @@ public class User {
     private List<Role> roles;
 
     @Column(name = "restricted_until")
-    private LocalDateTime restrictedUntil;
+    private LocalDateTime restrictedUntil;      //제재 종료 시간
 
     @Column(name = "restriction_reason")
-    private String restrictionReason;
+    private String restrictionReason;       //제재 이유
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Reservation> reservations = new ArrayList<>();

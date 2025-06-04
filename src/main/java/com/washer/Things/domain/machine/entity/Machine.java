@@ -33,9 +33,9 @@ public class Machine {
     private MachineStatus status = MachineStatus.available;
 
     @Column(nullable = false)
-    private boolean isOutOfOrder = false;
+    private boolean isOutOfOrder = false; //고장 여부
 
-    private LocalDateTime nextAvailableAt;
+    private LocalDateTime nextAvailableAt; //다음 사용가능 시간
 
     @OneToMany(mappedBy = "machine", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reservation> reservations;

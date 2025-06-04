@@ -28,10 +28,6 @@ public class MachineReport {
     @JoinColumn(name = "reported_by", nullable = false)
     private User reportedBy;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "resolved_by")
-    private User resolvedBy;
-
     @Column(columnDefinition = "TEXT", nullable = false)
     private String description;
 

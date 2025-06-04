@@ -23,19 +23,19 @@ public class AuditLog {
     private String userId;
 
     @Column
-    private String action;
+    private String action;      // 수행된 동작 UPDATE DELETE CREATE
 
     @Column
-    private String oldValues;
+    private String oldValues;       // 변경 전 값
 
     @Column
-    private String newValues;
+    private String newValues;       // 변경 후 값
 
     @Column(name = "user_agent", columnDefinition = "text")
-    private String userAgent;
+    private String userAgent;       // 클라이언트 정보 브라우저, 디바이스
 
     @Column
-    private String resourceType;
+    private String resourceType;        // 변경된 자원 타입 entity
 
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
