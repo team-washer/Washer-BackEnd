@@ -28,9 +28,6 @@ public class Machine {
     @Column(length = 3, nullable = false)
     private Floor floor;
 
-    @Column(length = 10, nullable = false)
-    private String location;
-
     @Enumerated(EnumType.STRING)
     @Column(length = 10, nullable = false)
     private MachineStatus status = MachineStatus.available;

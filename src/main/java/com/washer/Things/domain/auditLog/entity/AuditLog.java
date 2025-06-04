@@ -37,7 +37,7 @@ public class AuditLog {
     @Column
     private String resourceType;
 
+    @Column(nullable = false, updatable = false)
     @CreationTimestamp
-    @Column(nullable = false, updatable = false, insertable = false)
     private LocalDateTime createdAt;
 }

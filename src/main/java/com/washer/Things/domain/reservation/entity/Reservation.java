@@ -32,7 +32,7 @@ public class Reservation {
     private Machine machine;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_number", nullable = false)
+    @JoinColumn(name = "room_id", nullable = false)
     private Room room;
 
     @Enumerated(EnumType.STRING)
