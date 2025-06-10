@@ -1,4 +1,4 @@
-package com.washer.Things.domain.user.util;
+package com.washer.Things.global.util;
 import com.washer.Things.domain.user.entity.enums.Role;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

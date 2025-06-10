@@ -17,10 +17,7 @@ public class UserUtil {
 
     @Transactional
     public UserResponse getUserInfo() {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "해당 유저를 찾을 수 없습니다."));
+        User user = getCurrentUser();
 
         return UserResponse.builder()
                 .id(user.getId().toString())

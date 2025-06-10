@@ -17,4 +17,5 @@ public interface MachineRepository extends JpaRepository<Machine, Long> {
                                                  @Param("floor") Floor floor,
                                                  @Param("label") String label);
 
+    Optional<Machine> findByName(String machineName);
 }

@@ -128,8 +128,8 @@ public class MachineInfoServiceImpl implements MachineInfoService {
 
     private String getRemainingTime(JsonNode main, String type) {
         JsonNode node = type.equals("washer")
-                ? main.path("samsungce.washerWashingTime").path("completionTime").path("value")
-                : main.path("samsungce.dryerDryingTime").path("completionTime").path("value");
+                ? main.path("washerOperatingState").path("completionTime").path("value")
+                : main.path("dryerOperatingState").path("completionTime").path("value");
 
         return (node.isMissingNode() || node.asText().isEmpty()) ? "none" : node.asText();
     }

@@ -5,7 +5,7 @@ import com.washer.Things.domain.reservation.entity.Reservation;
 import com.washer.Things.domain.room.entity.Room;
 import com.washer.Things.domain.user.entity.enums.Gender;
 import com.washer.Things.domain.user.entity.enums.Role;
-import com.washer.Things.domain.user.util.StringListConverter;
+import com.washer.Things.global.util.StringListConverter;
 import jakarta.persistence.*;
 import lombok.*;
 import com.washer.Things.domain.machine.entity.MachineReport;
@@ -51,9 +51,6 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Reservation> reservations = new ArrayList<>();
-
-    @OneToMany(mappedBy = "reportedBy", cascade = CascadeType.ALL)
-    private List<MachineReport> reports = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "room_id")
