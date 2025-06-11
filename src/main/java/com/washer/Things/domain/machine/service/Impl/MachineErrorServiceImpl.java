@@ -3,6 +3,7 @@ package com.washer.Things.domain.machine.service.Impl;
 import com.washer.Things.domain.machine.entity.Machine;
 import com.washer.Things.domain.machine.entity.MachineReport;
 import com.washer.Things.domain.machine.presentation.dto.request.ReportMachineErrorRequest;
+import com.washer.Things.domain.machine.presentation.dto.response.MachineReportResponse;
 import com.washer.Things.domain.machine.repository.MachineReportRepository;
 import com.washer.Things.domain.machine.repository.MachineRepository;
 import com.washer.Things.domain.machine.service.MachineErrorService;
@@ -13,6 +14,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -36,5 +40,29 @@ public class MachineErrorServiceImpl implements MachineErrorService {
                 .build();
 
         machineReportRepository.save(report);
+    }
+
+    @Transactional
+    public List<MachineReportResponse> getAllReports() {
+        return machineReportRepository.findAllByOrderByIdDesc()
+                .stream()
+                .map(MachineReportResponse::from)
+                .toList();
+    }
+    @Transactional
+    public void updateReportStatus(Long reportId, MachineReport.ReportStatus status) {
+        MachineReport report = machineReportRepository.findById(reportId)
+                .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "신고 내역이 존재하지 않습니다."));
+
+        report.setStatus(status);
+
+        machineRepository.findByName(report.getMachine()).ifPresent(machine -> {
+            if (status == MachineReport.ReportStatus.in_progress) {
+                machine.setOutOfOrder(true);
+            } else if (status == MachineReport.ReportStatus.resolved) {
+                machine.setOutOfOrder(false);
+                report.setResolvedAt(LocalDateTime.now());
+            }
+        });
     }
 }
