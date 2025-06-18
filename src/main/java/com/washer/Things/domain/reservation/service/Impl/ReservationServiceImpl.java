@@ -283,21 +283,12 @@ public class ReservationServiceImpl implements ReservationService {
                 if ("paused".equalsIgnoreCase(state) || "ready".equalsIgnoreCase(state) || "stop".equalsIgnoreCase(state)) {
                     if (lockedReservation.getPausedSince() == null) {
                         lockedReservation.setPausedSince(now);
+                        lockedReservation.setStatus(Reservation.ReservationStatus.confirmed);
+                        lockedReservation.setConfirmedAt(LocalDateTime.now());
                         fcmService.sendToRoom(
                                 List.of(lockedReservation.getUser()),
-                                "기기 일시중지",
-                                "기기가 일시중지 되었어요. 5분 안에 다시 시작해주세요.",
-                                fcmTokenRepository
-                        );
-                    } else if (lockedReservation.getPausedSince().isBefore(now.minusMinutes(5))) {
-                        lockedReservation.setStatus(Reservation.ReservationStatus.cancelled);
-                        lockedReservation.setCancelledAt(now);
-                        lockedReservation.setPausedSince(null);
-                        promoteNextWaitingReservation(lockedReservation.getMachine().getId(), now);
-                        fcmService.sendToRoom(
-                                List.of(lockedReservation.getUser()),
-                                "예약 취소",
-                                "기기 사용이 5분 넘게 중지되어 예약이 취소되었어요.",
+                                "기기 정지 감지",
+                                "기기가 정지되었습니다 기기를 확인해주세요.",
                                 fcmTokenRepository
                         );
                     }
