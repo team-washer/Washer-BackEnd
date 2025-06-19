@@ -42,6 +42,8 @@ public class SignupServiceImpl implements SignupService {
         AuthCode authCode = authCodeRepository.save(new AuthCode(request, VerifyCodeType.SIGNUP));
         log.info("메일 전송");
         SimpleMailMessage mailMessage = new SimpleMailMessage();
+        log.error("메일 전송", request.getEmail());
+        log.info("메일 전송", request.getEmail());
         mailMessage.setTo(authCode.getEmail());
         mailMessage.setSubject("washer 이메일 확인 코드 입니다.");
         mailMessage.setText("이메일 인증 코드 입니다.\n" + authCode.getCode());
