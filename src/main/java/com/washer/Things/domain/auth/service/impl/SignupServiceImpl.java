@@ -15,6 +15,7 @@ import com.washer.Things.domain.user.repository.UserRepository;
 import com.washer.Things.global.exception.HttpException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SignupServiceImpl implements SignupService {
@@ -38,6 +40,7 @@ public class SignupServiceImpl implements SignupService {
         }
         authCodeRepository.deleteByEmail(request.getEmail());
         AuthCode authCode = authCodeRepository.save(new AuthCode(request, VerifyCodeType.SIGNUP));
+        log.info("메일 전송");
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(authCode.getEmail());
         mailMessage.setSubject("washer 이메일 확인 코드 입니다.");
