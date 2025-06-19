@@ -73,7 +73,7 @@ public class ReservationServiceImpl implements ReservationService {
             {
               "component": "main",
               "capability": "switch",
-              "command": "off"
+              "command": "on"
             }
           ]
         }
