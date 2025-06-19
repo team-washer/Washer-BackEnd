@@ -182,24 +182,24 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.setConfirmedAt(LocalDateTime.now());
     }
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 10000)
     @Transactional
     public void checkExpiredConfirmedReservations() {
         LocalDateTime now = LocalDateTime.now();
         SmartThingsToken token = smartThingsTokenService.getToken();
-
+        log.info("기기 러닝 상태 조회 1분 마다");
         List<Reservation> confirmedReservations = reservationRepository.findAllByStatus(Reservation.ReservationStatus.confirmed);
-
+        log.info("기기 러닝 상태 조회 1분 마다");
         for (Reservation r : confirmedReservations) {
             reservationRepository.findByIdWithLock(r.getId()).ifPresent(lockedReservation -> {
                 String deviceId = lockedReservation.getMachine().getDeviceId();
                 boolean isRunning = isMachineRunning(deviceId, token.getAccessToken(), lockedReservation.getMachine().getType());
-
+                log.info("기기 러닝 상태 조회 1분 마다", isRunning);
                 if (isRunning) {
                     if (lockedReservation.getStatus() != Reservation.ReservationStatus.running) {
                         lockedReservation.setStatus(Reservation.ReservationStatus.running);
                     }
-                } else if (lockedReservation.getConfirmedAt().isBefore(now.plusMinutes(5))) {
+                } else if (lockedReservation.getConfirmedAt().plusMinutes(2).isBefore(now)) {
                     lockedReservation.setStatus(Reservation.ReservationStatus.cancelled);
                     lockedReservation.setCancelledAt(now);
                     fcmService.sendToRoom(
@@ -213,7 +213,7 @@ public class ReservationServiceImpl implements ReservationService {
         }
     }
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 10000)
     @Transactional
     public void checkCompletedReservations() {
         LocalDateTime now = LocalDateTime.now();
@@ -226,7 +226,7 @@ public class ReservationServiceImpl implements ReservationService {
                 String deviceId = lockedReservation.getMachine().getDeviceId();
                 boolean isRunning = isMachineCompleted(deviceId, token.getAccessToken(), lockedReservation.getMachine().getType());
 
-                if (!isRunning) {
+                if (isRunning) {
                     lockedReservation.setStatus(Reservation.ReservationStatus.completed);
                     lockedReservation.setCompletedAt(now);
                     fcmService.sendToRoom(
@@ -265,7 +265,7 @@ public class ReservationServiceImpl implements ReservationService {
         promoteNextWaitingReservation(reservation.getMachine().getId(), LocalDateTime.now());
     }
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 10000)
     @Transactional
     public void checkPausedReservations() {
         LocalDateTime now = LocalDateTime.now();
@@ -281,17 +281,15 @@ public class ReservationServiceImpl implements ReservationService {
                 String state = getMachineState(deviceId, token.getAccessToken(), type);
 
                 if ("paused".equalsIgnoreCase(state) || "ready".equalsIgnoreCase(state) || "stop".equalsIgnoreCase(state)) {
-                    if (lockedReservation.getPausedSince() == null) {
                         lockedReservation.setPausedSince(now);
-                        lockedReservation.setStatus(Reservation.ReservationStatus.confirmed);
-                        lockedReservation.setConfirmedAt(LocalDateTime.now());
+                        lockedReservation.setStatus(Reservation.ReservationStatus.reserved);
+                        lockedReservation.setStartTime(LocalDateTime.now().plusMinutes(5));
                         fcmService.sendToRoom(
                                 List.of(lockedReservation.getUser()),
                                 "기기 정지 감지",
                                 "기기가 정지되었습니다 기기를 확인해주세요.",
                                 fcmTokenRepository
                         );
-                    }
                 } else {
                     lockedReservation.setPausedSince(null);
                 }
@@ -323,7 +321,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     private boolean isMachineCompleted(String deviceId, String accessToken, Machine.MachineType type) {
         MachineState state = fetchMachineStates(deviceId, accessToken, type);
-        return "finished".equalsIgnoreCase(state.jobState());
+        return "finished".equalsIgnoreCase(state.jobState()) || "finish".equalsIgnoreCase(state.jobState());
     }
 
     private String getMachineState(String deviceId, String accessToken, Machine.MachineType type) {

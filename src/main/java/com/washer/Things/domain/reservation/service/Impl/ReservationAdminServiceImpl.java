@@ -58,8 +58,8 @@ public class ReservationAdminServiceImpl implements ReservationAdminService {
 
     private String calculateRemainingTimeText(Reservation reservation) {
         return switch (reservation.getStatus()) {
-            case reserved -> formatRemainingTime(reservation.getCreatedAt().plusMinutes(5));
-            case confirmed -> formatRemainingTime(reservation.getConfirmedAt().plusMinutes(5));
+            case reserved -> formatRemainingTime(reservation.getStartTime());
+            case confirmed -> formatRemainingTime(reservation.getConfirmedAt().plusMinutes(2));
             case running -> fetchRemainingTimeFromSmartThings(reservation);
             default -> "00:00:00";
         };

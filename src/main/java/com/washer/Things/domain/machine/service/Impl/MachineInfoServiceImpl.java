@@ -41,6 +41,7 @@ public class MachineInfoServiceImpl implements MachineInfoService {
                 .block();
 
         try {
+
             ObjectMapper mapper = new ObjectMapper();
             JsonNode items = mapper.readTree(rawResponse).path("items");
 
@@ -95,22 +96,86 @@ public class MachineInfoServiceImpl implements MachineInfoService {
                 .ifPresent(machine -> {
                     builder.id(machine.getId());
                     builder.isOutOfOrder(machine.isOutOfOrder());
-                    builder.reservations(machine.getReservations().stream()
-                            .filter(res -> EnumSet.of(
-                                    Reservation.ReservationStatus.waiting,
-                                    Reservation.ReservationStatus.reserved,
-                                    Reservation.ReservationStatus.confirmed,
-                                    Reservation.ReservationStatus.running
-                            ).contains(res.getStatus()))
-                            .map(res -> {
-                                Map<String, Object> map = new HashMap<>();
-                                map.put("id", res.getId());
-                                map.put("room", res.getRoom().getName());
-                                map.put("status", res.getStatus());
-                                map.put("startTime", res.getCreatedAt());
-                                return map;
-                            }).collect(Collectors.toList()));
+
+                    List<Map<String, Object>> reservationList = new ArrayList<>();
+
+                    for (Reservation res : machine.getReservations()) {
+                        if (EnumSet.of(Reservation.ReservationStatus.waiting,
+                                Reservation.ReservationStatus.reserved,
+                                Reservation.ReservationStatus.confirmed,
+                                Reservation.ReservationStatus.running).contains(res.getStatus())) {
+
+                            Map<String, Object> map = new HashMap<>();
+                            map.put("id", res.getId());
+                            map.put("room", res.getRoom().getName());
+                            map.put("status", res.getStatus());
+                            map.put("startTime", res.getCreatedAt());
+
+                            reservationList.add(map);
+
+                            // ✅ remainingTime 덮어쓰기
+                            String remaining = calculateRemainingTimeByStatus(res);
+                            builder.remainingTime(remaining);
+                        }
+                    }
+
+                    builder.reservations(reservationList);
                 });
+    }
+
+    private String calculateRemainingTimeByStatus(Reservation res) {
+        LocalDateTime now = LocalDateTime.now();
+        Duration duration;
+
+        switch (res.getStatus()) {
+            case reserved -> duration = Duration.between(now, res.getStartTime());
+            case confirmed -> duration = Duration.between(now, res.getConfirmedAt().plusMinutes(2));
+            case running -> {
+                return fetchRemainingTimeFromSmartThings(res.getMachine().getDeviceId());
+            }
+            default -> duration = Duration.ZERO;
+        }
+
+        if (duration.isNegative()) return "00:00:00";
+
+        long h = duration.toHours();
+        long m = duration.toMinutes() % 60;
+        long s = duration.getSeconds() % 60;
+        return String.format("%02d:%02d:%02d", h, m, s);
+    }
+
+    private String fetchRemainingTimeFromSmartThings(String deviceId) {
+        try {
+            SmartThingsToken token = smartThingsTokenService.getToken();
+            JsonNode status = webClient.get()
+                    .uri("https://api.smartthings.com/v1/devices/" + deviceId + "/status")
+                    .headers(h -> h.setBearerAuth(token.getAccessToken()))
+                    .retrieve()
+                    .bodyToMono(JsonNode.class)
+                    .block();
+
+            JsonNode main = status.path("components").path("main");
+            String time = main.path("washerOperatingState").path("completionTime").path("value").asText(null);
+            if (time == null || time.equals("none")) {
+                time = main.path("dryerOperatingState").path("completionTime").path("value").asText(null);
+            }
+
+            if (time == null || time.equals("none")) return "00:00:00";
+
+            ZonedDateTime utc = ZonedDateTime.parse(time);
+            LocalDateTime local = utc.withZoneSameInstant(ZoneId.of("Asia/Seoul")).toLocalDateTime();
+            Duration d = Duration.between(LocalDateTime.now(), local);
+
+            if (d.isNegative()) return "00:00:00";
+
+            long h = d.toHours();
+            long m = d.toMinutes() % 60;
+            long s = d.getSeconds() % 60;
+            return String.format("%02d:%02d:%02d", h, m, s);
+
+        } catch (Exception e) {
+            return "00:00:00";
+        }
     }
 
     private String getDeviceType(String label) {

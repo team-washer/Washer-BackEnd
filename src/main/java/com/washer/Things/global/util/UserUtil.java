@@ -74,9 +74,9 @@ public class UserUtil {
     private String calculateRemainingTimeText(Reservation reservation) {
         switch (reservation.getStatus()) {
             case reserved:
-                return calculateTimeLeftText(reservation.getCreatedAt().plusMinutes(5));
+                return calculateTimeLeftText(reservation.getStartTime());
             case confirmed:
-                return calculateTimeLeftText(reservation.getConfirmedAt().plusMinutes(5));
+                return calculateTimeLeftText(reservation.getConfirmedAt().plusMinutes(2));
             case running:
                 return fetchRemainingTimeFromSmartThingsAsText(reservation);
             default:
