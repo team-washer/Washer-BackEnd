@@ -84,6 +84,8 @@ public class SignupServiceImpl implements SignupService {
         Room room = roomRepository.findByName(request.getRoom())
                 .orElseThrow(() -> new HttpException(HttpStatus.BAD_REQUEST, "존재하지 않는 방입니다."));
 
+        log.info("회원 가입", request.getEmail());
+        log.error("회원 가입", request.getEmail());
         user.setName(request.getName());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setSchoolNumber(request.getSchoolNumber());
