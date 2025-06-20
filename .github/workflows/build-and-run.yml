@@ -42,7 +42,7 @@ jobs:
             fi
           done
       - name: docker run new container
-        run: sudo docker run --name washercontainer --env-file /home/washer/.env --rm -d -p 10000:8080 washercontainer
+        run: sudo docker run --name washercontainer --env-file /home/washer/.env -v /etc/localtime:/etc/localtime:ro -v /usr/share/zoneinfo/Asia/Seoul:/etc/timezone:ro -p 10000:8080 --rm -d washercontainer
 
       - name: delete old docker image
         run: sudo docker system prune -f --filter "label!=mariadb"
