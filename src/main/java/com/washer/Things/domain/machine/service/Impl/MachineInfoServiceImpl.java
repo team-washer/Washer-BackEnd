@@ -113,7 +113,6 @@ public class MachineInfoServiceImpl implements MachineInfoService {
 
                             reservationList.add(map);
 
-                            // ✅ remainingTime 덮어쓰기
                             String remaining = calculateRemainingTimeByStatus(res);
                             builder.remainingTime(remaining);
                         }
