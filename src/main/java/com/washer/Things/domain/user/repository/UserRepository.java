@@ -1,5 +1,6 @@
 package com.washer.Things.domain.user.repository;
 
+import com.washer.Things.domain.room.entity.Room;
 import com.washer.Things.domain.user.entity.User;
 import com.washer.Things.domain.user.entity.enums.Gender;
 import com.washer.Things.global.entity.UserCredential;
@@ -16,7 +17,7 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
-
+    List<User> findAllByRoom(Room room);
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     boolean existsUserByEmail(String email);
 

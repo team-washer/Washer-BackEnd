@@ -7,9 +7,6 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: org.mariadb.jdbc.Driver
 
-  jackson:
-    time-zone: Asia/Seoul
-
   mail:
     properties:
       mail:
@@ -24,7 +21,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MariaDBDialect

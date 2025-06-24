@@ -1,6 +1,7 @@
 package com.washer.Things.global.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.washer.Things.domain.room.entity.Room;
 import com.washer.Things.domain.user.presentation.dto.request.RestrictUserRequest;
 import com.washer.Things.domain.user.presentation.dto.response.UserResponse;
 import com.washer.Things.domain.user.presentation.dto.response.AdminUserInfoResponse;
@@ -32,6 +33,7 @@ public class UserUtil {
     private final UserRepository userRepository;
     private final ReservationRepository reservationRepository;
     private final SmartThingsTokenService smartThingsTokenService;
+
     private final WebClient webClient;
 
     @Transactional
@@ -184,8 +186,12 @@ public class UserUtil {
                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "유저를 찾을 수 없습니다."));
 
         LocalDateTime until = calculateRestrictionEnd(request.getPeriod());
-        user.setRestrictedUntil(until);
-        user.setRestrictionReason(request.getPestrictionReason());
+        Room userRoom = user.getRoom();
+        List<User> usersInSameRoom = userRepository.findAllByRoom(userRoom);
+        for (User u : usersInSameRoom) {
+            u.setRestrictedUntil(until);
+            u.setRestrictionReason(request.getPestrictionReason());
+        }
     }
 
     private LocalDateTime calculateRestrictionEnd(String period) {
