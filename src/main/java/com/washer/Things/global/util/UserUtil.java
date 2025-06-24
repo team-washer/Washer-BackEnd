@@ -210,8 +210,12 @@ public class UserUtil {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "유저를 찾을 수 없습니다."));
 
-        user.setRestrictedUntil(null);
-        user.setRestrictionReason(null);
+        Room userRoom = user.getRoom();
+        List<User> usersInSameRoom = userRepository.findAllByRoom(userRoom);
+        for (User u : usersInSameRoom) {
+            u.setRestrictedUntil(null);
+            u.setRestrictionReason(null);
+        }
     }
 
     @Transactional
