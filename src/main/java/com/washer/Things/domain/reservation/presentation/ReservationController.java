@@ -54,6 +54,6 @@ public class ReservationController {
     @GetMapping("/machine/{machineId}/history")
     public ResponseEntity<ApiResponse<List<ReservationHistoryResponse>>> getMachineHistory(@PathVariable Long machineId) {
         List<ReservationHistoryResponse> history = reservationService.getReservationHistory(machineId);
-        return ResponseEntity.ok(ApiResponse.success(history));
+        return ResponseEntity.ok(ApiResponse.success(history, "기기 히스토리 조회 성공"));
     }
 }
