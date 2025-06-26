@@ -1,4 +1,4 @@
-package com.washer.Things.global.util;
+package com.washer.Things.domain.user.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.washer.Things.domain.room.entity.Room;
@@ -29,7 +29,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UserUtil {
+public class UserService {
     private final UserRepository userRepository;
     private final ReservationRepository reservationRepository;
     private final SmartThingsTokenService smartThingsTokenService;
@@ -51,7 +51,10 @@ public class UserUtil {
                 user.getRoom().getId(), activeStatuses);
 
         if (reservationOpt.isEmpty()) {
-            return buildUserResponseWithoutReservation(user);
+            Optional<Reservation> completedOpt = reservationRepository
+                    .findTopByRoomIdAndStatusOrderByCompletedAtDesc(user.getRoom().getId(), Reservation.ReservationStatus.completed);
+
+            return buildUserResponseWithoutActiveReservation(user, completedOpt.orElse(null));
         }
 
         Reservation reservation = reservationOpt.get();
@@ -70,6 +73,7 @@ public class UserUtil {
                 .status(reservation.getStatus().name().toLowerCase())
                 .startTime(reservation.getCreatedAt())
                 .remainingTime(remainingTime)
+                .completedAt(null)
                 .build();
     }
 
@@ -131,7 +135,7 @@ public class UserUtil {
         }
     }
 
-    private UserResponse buildUserResponseWithoutReservation(User user) {
+    private UserResponse buildUserResponseWithoutActiveReservation(User user, Reservation reservation) {
         return UserResponse.builder()
                 .id(user.getId().toString())
                 .name(user.getName())
@@ -140,11 +144,12 @@ public class UserUtil {
                 .gender(user.getGender().name().toLowerCase())
                 .restrictedUntil(user.getRestrictedUntil() != null ? user.getRestrictedUntil().toString() : null)
                 .restrictionReason(user.getRestrictionReason())
-                .reservationId(null)
-                .machineLabel(null)
-                .status(null)
-                .startTime(null)
+                .reservationId(reservation != null ? reservation.getId() : null)
+                .machineLabel(reservation != null ? reservation.getMachine().getName() : null)
+                .status(reservation != null ? reservation.getStatus().name().toLowerCase() : null)
+                .startTime(reservation != null ? reservation.getCreatedAt() : null)
                 .remainingTime(null)
+                .completedAt(reservation != null ? reservation.getCompletedAt() : null)
                 .build();
     }
 

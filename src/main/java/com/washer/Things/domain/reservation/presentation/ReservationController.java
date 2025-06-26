@@ -2,6 +2,7 @@ package com.washer.Things.domain.reservation.presentation;
 
 import com.washer.Things.domain.machine.entity.Machine;
 import com.washer.Things.domain.reservation.presentation.dto.response.AdminReservationResponse;
+import com.washer.Things.domain.reservation.presentation.dto.response.ReservationHistoryResponse;
 import com.washer.Things.domain.reservation.service.ReservationAdminService;
 import com.washer.Things.domain.reservation.service.ReservationService;
 import com.washer.Things.global.exception.dto.response.ApiResponse;
@@ -48,5 +49,11 @@ public class ReservationController {
     public ResponseEntity<ApiResponse<Void>> cancelReservationByAdmin(@PathVariable Long reservationId) {
         reservationAdminService.cancelReservationByAdmin(reservationId);
         return ResponseEntity.ok(ApiResponse.success("예약 강제 취소 성공"));
+    }
+
+    @GetMapping("/machine/{machineId}/history")
+    public ResponseEntity<ApiResponse<List<ReservationHistoryResponse>>> getMachineHistory(@PathVariable Long machineId) {
+        List<ReservationHistoryResponse> history = reservationService.getReservationHistory(machineId);
+        return ResponseEntity.ok(ApiResponse.success(history));
     }
 }

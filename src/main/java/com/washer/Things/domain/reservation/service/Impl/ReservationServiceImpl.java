@@ -8,13 +8,14 @@ import com.washer.Things.domain.machine.entity.Machine;
 import com.washer.Things.domain.machine.repository.MachineRepository;
 import com.washer.Things.domain.reservation.entity.Reservation;
 import com.washer.Things.domain.reservation.presentation.dto.response.MachineState;
+import com.washer.Things.domain.reservation.presentation.dto.response.ReservationHistoryResponse;
 import com.washer.Things.domain.reservation.repository.ReservationRepository;
 import com.washer.Things.domain.reservation.service.ReservationService;
 import com.washer.Things.domain.smartThingsToken.entity.SmartThingsToken;
 import com.washer.Things.domain.smartThingsToken.service.SmartThingsTokenService;
 import com.washer.Things.domain.user.entity.User;
 import com.washer.Things.global.exception.HttpException;
-import com.washer.Things.global.util.UserUtil;
+import com.washer.Things.domain.user.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,12 +26,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReservationServiceImpl implements ReservationService {
-    private final UserUtil userUtil;
+    private final UserService userService;
     private final ReservationRepository reservationRepository;
     private final MachineRepository machineRepository;
     private final SmartThingsTokenService smartThingsTokenService;
@@ -92,7 +92,7 @@ public class ReservationServiceImpl implements ReservationService {
     @Transactional
     public void createReservation(Long machineId) {
 
-        User user = userUtil.getCurrentUser();
+        User user = userService.getCurrentUser();
 
         if (user.getRestrictedUntil() != null && user.getRestrictedUntil().isAfter(LocalDateTime.now())) {
             throw new HttpException(HttpStatus.FORBIDDEN, "현재 정지된 사용자입니다. 예약이 불가능합니다.");
@@ -187,14 +187,11 @@ public class ReservationServiceImpl implements ReservationService {
     public void checkExpiredConfirmedReservations() {
         LocalDateTime now = LocalDateTime.now();
         SmartThingsToken token = smartThingsTokenService.getToken();
-        log.info("기기 러닝 상태 조회 1분 마다");
         List<Reservation> confirmedReservations = reservationRepository.findAllByStatus(Reservation.ReservationStatus.confirmed);
-        log.info("기기 러닝 상태 조회 1분 마다");
         for (Reservation r : confirmedReservations) {
             reservationRepository.findByIdWithLock(r.getId()).ifPresent(lockedReservation -> {
                 String deviceId = lockedReservation.getMachine().getDeviceId();
                 boolean isRunning = isMachineRunning(deviceId, token.getAccessToken(), lockedReservation.getMachine().getType());
-                log.info("기기 러닝 상태 조회 1분 마다", isRunning);
                 if (isRunning) {
                     if (lockedReservation.getStatus() != Reservation.ReservationStatus.running) {
                         lockedReservation.setStatus(Reservation.ReservationStatus.running);
@@ -244,7 +241,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Transactional
     public void cancelReservation(Long reservationId) {
-        User currentUser = userUtil.getCurrentUser();
+        User currentUser = userService.getCurrentUser();
 
         Reservation reservation = reservationRepository.findByIdWithLock(reservationId)
                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "예약을 찾을 수 없습니다."));
@@ -364,4 +361,25 @@ public class ReservationServiceImpl implements ReservationService {
         }
     }
 
+    @Transactional
+    public List<ReservationHistoryResponse> getReservationHistory(Long machineId) {
+        Machine machine = machineRepository.findById(machineId)
+                .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "기기를 찾을 수 없습니다."));
+
+        List<Reservation> recentReservations = reservationRepository
+                .findTop5ByMachineIdOrderByCreatedAtDesc(machineId);
+
+        return recentReservations.stream()
+                .map(r -> ReservationHistoryResponse.builder()
+                        .status(r.getStatus().name().toLowerCase())
+                        .createdAt(r.getCreatedAt())
+                        .pausedSince(r.getPausedSince())
+                        .confirmedAt(r.getConfirmedAt())
+                        .startedAt(r.getStartedAt())
+                        .completedAt(r.getCompletedAt())
+                        .cancelledAt(r.getCancelledAt())
+                        .machineLabel(machine.getName())
+                        .build())
+                .toList();
+    }
 }

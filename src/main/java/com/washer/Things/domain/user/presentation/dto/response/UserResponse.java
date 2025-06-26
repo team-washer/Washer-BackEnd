@@ -23,5 +23,6 @@ public class UserResponse {
     private String machineLabel;
     private String status;
     private LocalDateTime startTime;
+    private LocalDateTime completedAt;
     private String remainingTime;
 }

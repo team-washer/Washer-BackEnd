@@ -9,7 +9,7 @@ import com.washer.Things.domain.machine.repository.MachineRepository;
 import com.washer.Things.domain.machine.service.MachineErrorService;
 import com.washer.Things.domain.user.entity.User;
 import com.washer.Things.global.exception.HttpException;
-import com.washer.Things.global.util.UserUtil;
+import com.washer.Things.domain.user.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,12 +21,12 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class MachineErrorServiceImpl implements MachineErrorService {
-    private final UserUtil userUtil;
+    private final UserService userService;
     private final MachineReportRepository machineReportRepository;
     private final MachineRepository machineRepository;
     @Transactional
     public void reportMachineError(ReportMachineErrorRequest request) {
-        User user = userUtil.getCurrentUser();
+        User user = userService.getCurrentUser();
 
         Machine machine = machineRepository.findByName(request.getMachineName())
                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "해당 이름의 기기가 존재하지 않습니다."));

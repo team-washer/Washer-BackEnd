@@ -52,4 +52,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             @Param("type") Machine.MachineType type,
             @Param("floor") Machine.Floor floor
     );
+
+    Optional<Reservation> findTopByRoomIdAndStatusOrderByCompletedAtDesc(Long roomId, Reservation.ReservationStatus status);
+
+    List<Reservation> findTop5ByMachineIdOrderByCreatedAtDesc(Long machineId);
+
 }

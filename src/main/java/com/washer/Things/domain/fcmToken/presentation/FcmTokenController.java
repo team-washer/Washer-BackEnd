@@ -4,7 +4,7 @@ import com.washer.Things.domain.fcmToken.entity.FcmToken;
 import com.washer.Things.domain.fcmToken.presentation.dto.request.FcmTokenRequest;
 import com.washer.Things.domain.fcmToken.repository.FcmTokenRepository;
 import com.washer.Things.domain.user.entity.User;
-import com.washer.Things.global.util.UserUtil;
+import com.washer.Things.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,12 +19,12 @@ import java.util.Optional;
 @RequestMapping("/fcm-token")
 public class FcmTokenController {
 
-    private final UserUtil userUtil;
+    private final UserService userService;
     private final FcmTokenRepository fcmTokenRepository;
 
     @PostMapping
     public ResponseEntity<Void> saveToken(@RequestBody FcmTokenRequest request) {
-        User user = userUtil.getCurrentUser();
+        User user = userService.getCurrentUser();
         Optional<FcmToken> existingTokenOpt = fcmTokenRepository.findByUser(user);
 
         if (existingTokenOpt.isPresent()) {
