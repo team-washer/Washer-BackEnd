@@ -8,6 +8,7 @@ import com.washer.Things.domain.machine.repository.MachineReportRepository;
 import com.washer.Things.domain.machine.repository.MachineRepository;
 import com.washer.Things.domain.machine.service.MachineErrorService;
 import com.washer.Things.domain.user.entity.User;
+import com.washer.Things.global.auditLog.Auditable;
 import com.washer.Things.global.exception.HttpException;
 import com.washer.Things.domain.user.service.UserService;
 import jakarta.transaction.Transactional;
@@ -25,6 +26,7 @@ public class MachineErrorServiceImpl implements MachineErrorService {
     private final MachineReportRepository machineReportRepository;
     private final MachineRepository machineRepository;
     @Transactional
+    @Auditable(action = "CREATE", resourceType = "MachineReport")
     public void reportMachineError(ReportMachineErrorRequest request) {
         User user = userService.getCurrentUser();
 
@@ -50,6 +52,7 @@ public class MachineErrorServiceImpl implements MachineErrorService {
                 .toList();
     }
     @Transactional
+    @Auditable(action = "UPDATE", resourceType = "MachineReport")
     public void updateReportStatus(Long reportId, MachineReport.ReportStatus status) {
         MachineReport report = machineReportRepository.findById(reportId)
                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "신고 내역이 존재하지 않습니다."));

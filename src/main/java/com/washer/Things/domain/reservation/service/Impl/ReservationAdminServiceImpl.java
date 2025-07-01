@@ -8,6 +8,7 @@ import com.washer.Things.domain.reservation.repository.ReservationRepository;
 import com.washer.Things.domain.reservation.service.ReservationAdminService;
 import com.washer.Things.domain.smartThingsToken.entity.SmartThingsToken;
 import com.washer.Things.domain.smartThingsToken.service.SmartThingsTokenService;
+import com.washer.Things.global.auditLog.Auditable;
 import com.washer.Things.global.exception.HttpException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -115,6 +116,7 @@ public class ReservationAdminServiceImpl implements ReservationAdminService {
     }
 
     @Transactional
+    @Auditable(action = "DELETE", resourceType = "Reservation")
     public void cancelReservationByAdmin(Long reservationId) {
         Reservation reservation = reservationRepository.findByIdWithLock(reservationId)
                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "예약을 찾을 수 없습니다."));

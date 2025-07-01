@@ -10,6 +10,7 @@ import com.washer.Things.domain.machine.presentation.dto.response.MachineReportR
 import com.washer.Things.domain.machine.service.MachineErrorService;
 import com.washer.Things.domain.machine.service.MachineInfoService;
 import com.washer.Things.domain.machine.service.MachineOutOfOrderService;
+import com.washer.Things.global.auditLog.Auditable;
 import com.washer.Things.global.exception.dto.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

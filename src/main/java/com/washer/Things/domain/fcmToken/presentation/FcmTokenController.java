@@ -3,8 +3,10 @@ package com.washer.Things.domain.fcmToken.presentation;
 import com.washer.Things.domain.fcmToken.entity.FcmToken;
 import com.washer.Things.domain.fcmToken.presentation.dto.request.FcmTokenRequest;
 import com.washer.Things.domain.fcmToken.repository.FcmTokenRepository;
+import com.washer.Things.domain.fcmToken.service.FcmService;
 import com.washer.Things.domain.user.entity.User;
 import com.washer.Things.domain.user.service.UserService;
+import com.washer.Things.global.exception.dto.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,25 +22,11 @@ import java.util.Optional;
 public class FcmTokenController {
 
     private final UserService userService;
-    private final FcmTokenRepository fcmTokenRepository;
-
+    private final FcmService fcmService;
     @PostMapping
-    public ResponseEntity<Void> saveToken(@RequestBody FcmTokenRequest request) {
+    public ResponseEntity<ApiResponse<Void>> saveToken(@RequestBody FcmTokenRequest request) {
         User user = userService.getCurrentUser();
-        Optional<FcmToken> existingTokenOpt = fcmTokenRepository.findByUser(user);
-
-        if (existingTokenOpt.isPresent()) {
-            FcmToken existingToken = existingTokenOpt.get();
-            existingToken.setToken(request.getToken());
-            existingToken.setPlatform(request.getPlatform());
-            fcmTokenRepository.save(existingToken);
-        } else {
-            FcmToken newToken = new FcmToken();
-            newToken.setUser(user);
-            newToken.setToken(request.getToken());
-            newToken.setPlatform(request.getPlatform());
-            fcmTokenRepository.save(newToken);
-        }
-        return ResponseEntity.ok().build();
+        fcmService.saveToken(user, request.getToken(), request.getPlatform());
+        return ResponseEntity.ok(ApiResponse.success("fcm 토큰 저장 성공"));
     }
 }

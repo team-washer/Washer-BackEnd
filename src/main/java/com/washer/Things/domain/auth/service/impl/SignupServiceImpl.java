@@ -12,6 +12,7 @@ import com.washer.Things.domain.user.entity.enums.Gender;
 import com.washer.Things.domain.user.entity.enums.Role;
 import com.washer.Things.domain.user.entity.User;
 import com.washer.Things.domain.user.repository.UserRepository;
+import com.washer.Things.global.auditLog.Auditable;
 import com.washer.Things.global.exception.HttpException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -143,6 +144,7 @@ public class SignupServiceImpl implements SignupService {
     }
 
     @Transactional
+    @Auditable(action = "CREATE", resourceType = "User")
     public void signup(SignupRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "없는 유저 입니다."));

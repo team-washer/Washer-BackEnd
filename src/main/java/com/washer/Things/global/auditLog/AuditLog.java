@@ -1,4 +1,4 @@
-package com.washer.Things.domain.auditLog.entity;
+package com.washer.Things.global.auditLog;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -26,10 +26,10 @@ public class AuditLog {
     private String action;      // 수행된 동작 UPDATE DELETE CREATE
 
     @Column
-    private String oldValues;       // 변경 전 값
+    private String request;
 
     @Column
-    private String newValues;       // 변경 후 값
+    private String response;
 
     @Column(name = "user_agent", columnDefinition = "text")
     private String userAgent;       // 클라이언트 정보 브라우저, 디바이스

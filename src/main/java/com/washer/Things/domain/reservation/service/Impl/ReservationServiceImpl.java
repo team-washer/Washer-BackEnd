@@ -14,6 +14,7 @@ import com.washer.Things.domain.reservation.service.ReservationService;
 import com.washer.Things.domain.smartThingsToken.entity.SmartThingsToken;
 import com.washer.Things.domain.smartThingsToken.service.SmartThingsTokenService;
 import com.washer.Things.domain.user.entity.User;
+import com.washer.Things.global.auditLog.Auditable;
 import com.washer.Things.global.exception.HttpException;
 import com.washer.Things.domain.user.service.UserService;
 import jakarta.transaction.Transactional;
@@ -90,6 +91,7 @@ public class ReservationServiceImpl implements ReservationService {
         log.info("기기 {} 종료 시도 응답: {}", deviceId);
     }
     @Transactional
+    @Auditable(action = "CREATE", resourceType = "Reservation")
     public void createReservation(Long machineId) {
 
         User user = userService.getCurrentUser();
@@ -161,8 +163,7 @@ public class ReservationServiceImpl implements ReservationService {
                     fcmService.sendToRoom(
                             List.of(lockedReservation.getUser()),
                             "예약 취소",
-                            "예약이 자동으로 취소되었어요.",
-                            fcmTokenRepository
+                            "예약이 자동으로 취소되었어요."
                     );
                 }
             });
@@ -170,6 +171,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Transactional
+    @Auditable(action = "UPDATE", resourceType = "Reservation")
     public void confirmReservation(Long reservationId) {
         Reservation reservation = reservationRepository.findByIdWithLock(reservationId)
                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "예약을 찾을 수 없습니다."));
@@ -202,8 +204,7 @@ public class ReservationServiceImpl implements ReservationService {
                     fcmService.sendToRoom(
                             List.of(lockedReservation.getUser()),
                             "예약 취소",
-                            "기기 사용이 시작되지 않아 예약이 취소되었어요.",
-                            fcmTokenRepository
+                            "기기 사용이 시작되지 않아 예약이 취소되었어요."
                     );
                 }
             });
@@ -229,8 +230,7 @@ public class ReservationServiceImpl implements ReservationService {
                     fcmService.sendToRoom(
                             List.of(lockedReservation.getUser()),
                             "세탁 완료",
-                            "세탁이 완료되었어요! 기기에서 꺼내 주세요.",
-                            fcmTokenRepository
+                            "세탁이 완료되었어요! 기기에서 꺼내 주세요."
                     );
                     promoteNextWaitingReservation(lockedReservation.getMachine().getId(), now);
                 }
@@ -240,6 +240,7 @@ public class ReservationServiceImpl implements ReservationService {
 
 
     @Transactional
+    @Auditable(action = "DELETE", resourceType = "Reservation")
     public void cancelReservation(Long reservationId) {
         User currentUser = userService.getCurrentUser();
 
@@ -284,8 +285,7 @@ public class ReservationServiceImpl implements ReservationService {
                         fcmService.sendToRoom(
                                 List.of(lockedReservation.getUser()),
                                 "기기 정지 감지",
-                                "기기가 정지되었습니다 기기를 확인해주세요.",
-                                fcmTokenRepository
+                                "기기가 정지되었습니다 기기를 확인해주세요."
                         );
                 } else {
                     lockedReservation.setPausedSince(null);
@@ -294,6 +294,7 @@ public class ReservationServiceImpl implements ReservationService {
         }
     }
 
+    @Auditable(action = "UPDATE", resourceType = "Reservation")
     public void promoteNextWaitingReservation(Long machineId, LocalDateTime now) {
         Reservation nextWaiting = reservationRepository
                 .findFirstWaitingWithLock(machineId, Reservation.ReservationStatus.waiting)
@@ -305,8 +306,7 @@ public class ReservationServiceImpl implements ReservationService {
             fcmService.sendToRoom(
                     List.of(nextWaiting.getUser()),
                     "기기 예약 확정",
-                    "기기 예약이 확정되었어요! 5분 안에 시작해주세요.",
-                    fcmTokenRepository
+                    "기기 예약이 확정되었어요! 5분 안에 시작해주세요."
             );
         }
     }

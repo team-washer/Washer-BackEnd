@@ -5,6 +5,7 @@ import com.washer.Things.domain.machine.presentation.dto.request.MachineOutOfOrd
 import com.washer.Things.domain.machine.presentation.dto.response.MachineOutOfOrderResponse;
 import com.washer.Things.domain.machine.repository.MachineRepository;
 import com.washer.Things.domain.machine.service.MachineOutOfOrderService;
+import com.washer.Things.global.auditLog.Auditable;
 import com.washer.Things.global.exception.HttpException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class MachineOutOfOrderServiceImpl implements MachineOutOfOrderService {
     }
 
     @Transactional
+    @Auditable(action = "UPDATE", resourceType = "Machine")
     public void updateMachineStatus(MachineOutOfOrderRequest request) {
         Machine machine = machineRepository.findByName(request.getName())
                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "해당 이름의 기기를 찾을 수 없습니다."));

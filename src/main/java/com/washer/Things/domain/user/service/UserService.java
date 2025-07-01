@@ -12,6 +12,7 @@ import com.washer.Things.domain.smartThingsToken.service.SmartThingsTokenService
 import com.washer.Things.domain.user.entity.User;
 import com.washer.Things.domain.user.entity.enums.Gender;
 import com.washer.Things.domain.user.repository.UserRepository;
+import com.washer.Things.global.auditLog.Auditable;
 import com.washer.Things.global.exception.HttpException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -186,6 +187,7 @@ public class UserService {
 
 
     @Transactional
+    @Auditable(action = "UPDATE", resourceType = "User")
     public void restrictUser(Long userId, RestrictUserRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "유저를 찾을 수 없습니다."));
@@ -211,6 +213,7 @@ public class UserService {
     }
 
     @Transactional
+    @Auditable(action = "UPDATE", resourceType = "User")
     public void unrestrictUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "유저를 찾을 수 없습니다."));
