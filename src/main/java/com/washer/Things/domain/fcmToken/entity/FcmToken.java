@@ -4,6 +4,9 @@ import com.washer.Things.domain.fcmToken.entity.enums.PlatformType;
 import com.washer.Things.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Table(name = "fcm_token")
 @Entity
@@ -24,4 +27,11 @@ public class FcmToken {
 
     @Enumerated(EnumType.STRING)
     private PlatformType platform;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    public void updateToken(String token) {
+        this.token = token;
+    }
 }

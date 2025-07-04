@@ -38,7 +38,6 @@ public class ReservationServiceImpl implements ReservationService {
     private final WebClient webClient;
     private final ObjectMapper objectMapper;
     private final FcmService fcmService;
-    private final FcmTokenRepository fcmTokenRepository;
 
 
     @Scheduled(fixedRate = 2000)

@@ -7,6 +7,7 @@ import com.washer.Things.global.exception.handler.CustomAccessDeniedHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -18,9 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
 import java.util.List;
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -37,6 +36,19 @@ public class WebSecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((authorizeHttpRequests) ->
                         authorizeHttpRequests
+                                .requestMatchers(HttpMethod.POST, "/fcm-token/test").hasRole("ADMIN")
+
+                                .requestMatchers(HttpMethod.GET, "/machine/admin/reports").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PATCH, "/machine/admin/reports/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/machine/admin/out-of-order").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PATCH, "/machine/admin/out-of-order").hasRole("ADMIN")
+
+                                .requestMatchers(HttpMethod.GET, "/reservation/admin/reservations").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/reservation/admin/**").hasRole("ADMIN")
+
+                                .requestMatchers(HttpMethod.GET, "/user/admin/user/info").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/user/admin/**/restrict").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/user/admin/**/unrestrict").hasRole("ADMIN")
                                 .anyRequest().permitAll()
                 )
                 .sessionManagement((sessionManagement) ->
