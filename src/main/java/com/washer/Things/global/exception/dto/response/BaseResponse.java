@@ -10,7 +10,7 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class ApiResponse<T> {
+public class BaseResponse<T> {
     private boolean success;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -24,8 +24,8 @@ public class ApiResponse<T> {
     private Instant timestamp;
 
     // 성공 응답 생성
-    public static <T> ApiResponse<T> success(T data, String message) {
-        return ApiResponse.<T>builder()
+    public static <T> BaseResponse<T> success(T data, String message) {
+        return BaseResponse.<T>builder()
                 .success(true)
                 .data(data)
                 .message(message)
@@ -33,12 +33,12 @@ public class ApiResponse<T> {
                 .build();
     }
 
-    public static <T> ApiResponse<T> success(T data) {
+    public static <T> BaseResponse<T> success(T data) {
         return success(data, "Success");
     }
 
-    public static ApiResponse<Void> success(String message) {
-        return ApiResponse.<Void>builder()
+    public static BaseResponse<Void> success(String message) {
+        return BaseResponse.<Void>builder()
                 .success(true)
                 .message(message)
                 .timestamp(Instant.now())
@@ -46,8 +46,8 @@ public class ApiResponse<T> {
     }
 
     // 에러 응답 생성
-    public static ApiResponse<Void> error(HttpStatus statusCode, String message) {
-        return ApiResponse.<Void>builder()
+    public static BaseResponse<Void> error(HttpStatus statusCode, String message) {
+        return BaseResponse.<Void>builder()
                 .success(false)
                 .error(new ApiError(statusCode, message, null))
                 .message(message)
@@ -55,8 +55,8 @@ public class ApiResponse<T> {
                 .build();
     }
 
-    public static ApiResponse<Void> error(HttpStatus statusCode, String message, Object details) {
-        return ApiResponse.<Void>builder()
+    public static BaseResponse<Void> error(HttpStatus statusCode, String message, Object details) {
+        return BaseResponse.<Void>builder()
                 .success(false)
                 .error(new ApiError(statusCode, message, details))
                 .message(message)
