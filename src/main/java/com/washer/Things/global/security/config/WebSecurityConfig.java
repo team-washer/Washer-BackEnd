@@ -47,8 +47,8 @@ public class WebSecurityConfig {
                                 .requestMatchers(HttpMethod.DELETE, "/reservation/admin/**").hasRole("ADMIN")
 
                                 .requestMatchers(HttpMethod.GET, "/user/admin/user/info").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.POST, "/user/admin/**/restrict").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.POST, "/user/admin/**/unrestrict").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/user/admin/*/restrict").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/user/admin/*/unrestrict").hasRole("ADMIN")
                                 .anyRequest().permitAll()
                 )
                 .sessionManagement((sessionManagement) ->

@@ -5,6 +5,7 @@ import com.washer.Things.global.entity.JwtType;
 import com.washer.Things.global.exception.HttpException;
 import com.washer.Things.global.security.jwt.dto.JwtDetails;
 import com.washer.Things.global.util.DateUtil;
+import com.washer.Things.global.util.RedisUtil;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.http.HttpStatus;
@@ -22,10 +23,12 @@ public class JwtProvider {
 
     private final AuthDetailsService authDetailsService;
     private final JwtProperties jwtProperties;
+    private final RedisUtil redisUtil;
 
-    public JwtProvider(AuthDetailsService authDetailsService, JwtProperties jwtProperties) {
+    public JwtProvider(AuthDetailsService authDetailsService, JwtProperties jwtProperties, RedisUtil redisUtil) {
         this.authDetailsService = authDetailsService;
         this.jwtProperties = jwtProperties;
+        this.redisUtil = redisUtil;
     }
 
     public UsernamePasswordAuthenticationToken getAuthentication(String token) {
@@ -68,7 +71,6 @@ public class JwtProvider {
 
         byte[] keyBytes = Base64.getEncoder().encode(tokenKey.getBytes());
         var signingKey = Keys.hmacShaKeyFor(keyBytes);
-
         try {
             return Jwts
                     .parser()
@@ -86,6 +88,7 @@ public class JwtProvider {
             throw new HttpException(HttpStatus.INTERNAL_SERVER_ERROR, "기타 JWT 토큰 오류입니다.");
         }
     }
+
 
 
     public JwtDetails generateToken(Long id, JwtType jwtType) {
@@ -111,5 +114,25 @@ public class JwtProvider {
                 .compact();
 
         return new JwtDetails(token, expiredAt);
+    }
+
+    public long getRemainingValidity(String token) {
+        try {
+            String tokenKey = jwtProperties.getAccessTokenKey();
+            byte[] keyBytes = Base64.getEncoder().encode(tokenKey.getBytes());
+            var signingKey = Keys.hmacShaKeyFor(keyBytes);
+
+            Claims claims = Jwts.parser()
+                    .verifyWith(signingKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+
+            long now = System.currentTimeMillis();
+            return claims.getExpiration().getTime() - now;
+
+        } catch (JwtException e) {
+            return 0;
+        }
     }
 }

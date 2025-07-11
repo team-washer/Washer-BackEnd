@@ -1,6 +1,7 @@
 package com.washer.Things.global.security.config;
 import com.washer.Things.global.filter.JwtFilter;
 import com.washer.Things.global.security.jwt.JwtProvider;
+import com.washer.Things.global.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

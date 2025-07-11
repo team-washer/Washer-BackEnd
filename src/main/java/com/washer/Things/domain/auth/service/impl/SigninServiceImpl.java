@@ -9,11 +9,15 @@ import com.washer.Things.global.entity.JwtType;
 import com.washer.Things.global.exception.HttpException;
 import com.washer.Things.global.security.jwt.JwtProvider;
 import com.washer.Things.global.security.jwt.dto.JwtDetails;
+import com.washer.Things.global.util.RedisUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +25,10 @@ public class SigninServiceImpl implements SigninService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final RedisUtil redisUtil;
+
+    @Value("${jwt.refreshTokenExpires}")
+    private long refreshTokenTtl;
     @Transactional
     public SignInResponse execute(SigninRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
@@ -32,6 +40,8 @@ public class SigninServiceImpl implements SigninService {
 
         JwtDetails accessToken = jwtProvider.generateToken(user.getId(), JwtType.ACCESS_TOKEN);
         JwtDetails refreshToken = jwtProvider.generateToken(user.getId(), JwtType.REFRESH_TOKEN);
+
+        redisUtil.setRefreshToken(user.getId().toString(), refreshToken.getToken(), refreshTokenTtl);
 
         return SignInResponse.builder()
                 .accessToken(accessToken.getToken())

@@ -44,6 +44,11 @@ spring:
             authorization-uri: https://api.smartthings.com/oauth/authorize
             token-uri: https://api.smartthings.com/oauth/token
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
 jwt:
   accessTokenKey: ${JWT_ACCESS_TOKEN_KEY}
   accessTokenExpires: 1800000

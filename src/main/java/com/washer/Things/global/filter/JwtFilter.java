@@ -1,6 +1,8 @@
 package com.washer.Things.global.filter;
 
+import com.washer.Things.global.entity.JwtType;
 import com.washer.Things.global.security.jwt.JwtProvider;
+import com.washer.Things.global.util.RedisUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,5 +32,4 @@ public class JwtFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
-
 }

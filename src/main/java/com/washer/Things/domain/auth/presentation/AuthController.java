@@ -20,11 +20,14 @@ public class AuthController {
     private final SigninService signinService;
     private final RefreshService refreshService;
     private final PasswordChangeService passwordChangeService;
+    private final LogoutService logoutService;
     private final JwtProvider jwtProvider;
 
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<Void>> signup(@RequestBody @Valid SignupRequest request) {
+        System.out.println(request);
         signupService.signup(request);
+        System.out.println(request);
         return ResponseEntity.ok(ApiResponse.success("회원가입 성공"));
     }
 
@@ -63,5 +66,12 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Void>> mailCheck(@RequestBody @Valid PasswordChangeRequest request) {
         passwordChangeService.passwordChange(request);
         return ResponseEntity.ok(ApiResponse.success("비밀번호 변경 성공"));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(@RequestHeader("Refresh-Token") String refreshToken) {
+        String resolveRefreshToken = jwtProvider.resolveToken(refreshToken);
+        logoutService.logout(resolveRefreshToken);
+        return ResponseEntity.ok(ApiResponse.success("로그아웃 성공"));
     }
 }
