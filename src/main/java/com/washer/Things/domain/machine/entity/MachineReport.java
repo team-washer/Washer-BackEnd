@@ -20,14 +20,13 @@ public class MachineReport {
     @Column(name = "machine_report_id")
     private Long id;
 
-    @Column
-    private String machine;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "machine_id", nullable = false)
+    private Machine machine;
 
-    @Column
-    private String reportedByUserName;
-
-    @Column
-    private String reportedByUserNumber;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "reported_by_user_id", nullable = false)
+    private User reportedBy;
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String description;

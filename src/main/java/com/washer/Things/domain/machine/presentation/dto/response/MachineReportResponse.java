@@ -18,9 +18,9 @@ public class MachineReportResponse {
     public static MachineReportResponse from(MachineReport report) {
         return MachineReportResponse.builder()
                 .reportId(report.getId())
-                .machineName(report.getMachine())
-                .reportedByUserName(report.getReportedByUserName())
-                .reportedByUserNumber(report.getReportedByUserNumber())
+                .machineName(report.getMachine().getName())
+                .reportedByUserName(report.getReportedBy().getName())
+                .reportedByUserNumber(report.getReportedBy().getSchoolNumber())
                 .description(report.getDescription())
                 .status(report.getStatus().name())
                 .resolvedAt(report.getResolvedAt())

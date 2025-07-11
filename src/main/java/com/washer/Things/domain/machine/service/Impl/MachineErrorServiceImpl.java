@@ -34,9 +34,8 @@ public class MachineErrorServiceImpl implements MachineErrorService {
                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "해당 이름의 기기가 존재하지 않습니다."));
 
         MachineReport report = MachineReport.builder()
-                .machine(machine.getName())
-                .reportedByUserName(user.getName())
-                .reportedByUserNumber(user.getSchoolNumber())
+                .machine(machine)
+                .reportedBy(user)
                 .description(request.getDescription())
                 .status(MachineReport.ReportStatus.pending)
                 .build();
@@ -59,13 +58,12 @@ public class MachineErrorServiceImpl implements MachineErrorService {
 
         report.setStatus(status);
 
-        machineRepository.findByName(report.getMachine()).ifPresent(machine -> {
-            if (status == MachineReport.ReportStatus.in_progress) {
-                machine.setOutOfOrder(true);
-            } else if (status == MachineReport.ReportStatus.resolved) {
-                machine.setOutOfOrder(false);
-                report.setResolvedAt(LocalDateTime.now());
-            }
-        });
+        Machine machine = report.getMachine();
+        if (status == MachineReport.ReportStatus.in_progress) {
+            machine.setOutOfOrder(true);
+        } else if (status == MachineReport.ReportStatus.resolved) {
+            machine.setOutOfOrder(false);
+            report.setResolvedAt(LocalDateTime.now());
+        }
     }
 }
